@@ -1,11 +1,15 @@
+const User = require('../models/user');
+
 // signup
-export const signupUser = async (req, res) => {};
+const signupUser = async (req, res) => {};
 
 // login
-export const loginUser = async (req, res) => {};
+const loginUser = async (req, res) => {};
 
 // signout
-export const signoutUser = async (req, res) => {};
+const logoutUser = async (req, res) => {};
 
 // deleteUser
-export const deleteUser = async (req, res) => {};
+const deleteUser = async (req, res) => {};
+
+module.exports = { signupUser, loginUser, logoutUser, deleteUser };

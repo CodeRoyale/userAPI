@@ -50,11 +50,11 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 
 //Routes
 app.use('/', require('./routes/main'));
+app.use('/users', require('./routes/users'));
 
 //start listening
 const server = app.listen(PORT, () => {

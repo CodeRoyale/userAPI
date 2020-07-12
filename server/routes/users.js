@@ -1,9 +1,13 @@
-import { Router } from 'express';
-
+const Router = require('express');
 const router = Router();
 
-router.get('/', (req, res) =>
-  res.send('CodeRoyale API Server is up and running')
-);
+const {
+  signupUser,
+  loginUser,
+  logoutUser,
+  deleteUser,
+} = require('../controllers/userController');
 
-export default router;
+router.post('/signup', signupUser);
+
+module.exports = router;
