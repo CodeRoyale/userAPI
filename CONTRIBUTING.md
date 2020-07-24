@@ -23,53 +23,54 @@
   ```
 
   - Where `TYPE` is one of the following:
-  
-       * 🎉 Initial commit
-       * 🔖 Version tag
-       * ✨ New feature
-       * 🐛 Bugfix
-       * 📇 Metadata
-       * 📚 Documentation
-       * 💡 Documenting source code
-       * 🐎 Performance
-       * 💄 Cosmetic
-       * 🚨 Tests
-       * ✅ Adding a test
-       * ✔️ Make a test pass
-       * ⚡ General update
-       * 🎨 Improve format/structure
-       * 🔨 Refactor code
-       * 🔥 Removing code/files
-       * 💚 Continuous Integration
-       * 🔒 Security
-       * ⬆️ Upgrading dependencies
-       * ⬇️ Downgrading dependencies
-       * 👕 Lint
-       * 👽 Translation
-       * 📝 Text
-       * 🚑 Critical hotfix
-       * 🚀 Deploying stuff
-       * 🍎 Fixing on MacOS
-       * 🐧 Fixing on Linux
-       * 🏁 Fixing on Windows
-       * 🚧 Work in progress
-       * 👷 Adding CI build system
-       * 📈 Analytics or tracking code
-       * ➖ Removing a dependency
-       * ➕ Adding a dependency
-       * 🐳 Docker
-       * 🔧 Configuration files
-       * 📦 Package.json in JS
-       * 🔀 Merging branches
-       * 💩 Bad code / need improv.
-       * ⏪ Reverting changes
-       * 💥 Breaking changes
-       * 👌 Code review changes
-       * ♿ Accessibility
-       * 🚚 Move/rename repository
-       * ❔ Other
-  
-  - And `MODULE` is one of the following:  
+
+    - 🎉 Initial commit
+    - 🔖 Version tag
+    - ✨ New feature
+    - 🐛 Bugfix
+    - 📇 Metadata
+    - 📚 Documentation
+    - 💡 Documenting source code
+    - 🐎 Performance
+    - 💄 Cosmetic
+    - 🚨 Tests
+    - ✅ Adding a test
+    - ✔️ Make a test pass
+    - ⚡ General update
+    - 🎨 Improve format/structure
+    - 🔨 Refactor code
+    - 🔥 Removing code/files
+    - 💚 Continuous Integration
+    - 🔒 Security
+    - ⬆️ Upgrading dependencies
+    - ⬇️ Downgrading dependencies
+    - 👕 Lint
+    - 👽 Translation
+    - 📝 Text
+    - 🚑 Critical hotfix
+    - 🚀 Deploying stuff
+    - 🍎 Fixing on MacOS
+    - 🐧 Fixing on Linux
+    - 🏁 Fixing on Windows
+    - 🚧 Work in progress
+    - 👷 Adding CI build system
+    - 📈 Analytics or tracking code
+    - ➖ Removing a dependency
+    - ➕ Adding a dependency
+    - 🐳 Docker
+    - 🔧 Configuration files
+    - 📦 Package.json in JS
+    - 🔀 Merging branches
+    - 💩 Bad code / need improv.
+    - ⏪ Reverting changes
+    - 💥 Breaking changes
+    - 👌 Code review changes
+    - ♿ Accessibility
+    - 🚚 Move/rename repository
+    - ❔ Other
+
+  - And `MODULE` is one of the following:
+
     - Api,
     - Auth, or
     - Code-Setup
@@ -95,3 +96,73 @@
   - The comments should explain a bit about the purpose/history/overview – don’t assume the reader knows it (or link to the issue that explains everything).
 
   - Be explicit about what you want feedback on, or why you are asking for specific reviewers.
+
+## How to document API
+
+- Follow the order to keep the documentation clear and clean
+- All the api documentation files to be kept inside the \_docs folder
+
+1.  Specify the tag
+
+```
+// Tag
+/**
+* @swagger
+* tags:
+*   name: ABC
+*   description:
+*/
+```
+
+2.  Following up with the Modal Schema Definition
+
+```
+// ABC Schema
+/**
+* @swagger
+*  components:
+*    schemas:
+*      ABC:
+*/
+```
+
+3.  Add all the components that will be used to define the responses
+
+```
+// Sample components used in the responses
+/**
+* @swagger
+*  components:
+*    schemas:
+*      AddABC:
+*        type: object
+*        properties:
+*          message:
+*            type:
+*            description:
+*        example:
+*/
+```
+
+4.  Add all the paths with their method and responses
+
+```
+//  paths with their method and responses
+/**
+* @swagger
+* path:
+*  /ABC/:
+*    post:
+*      summary:
+*      tags: [ABC]
+*      requestBody:
+*        required: true
+*        content:
+*          application/json:
+*            schema:
+*              $ref: '#/components/schemas/AddABC'
+*      responses:
+*        "200":
+*        "401":
+*/
+```
