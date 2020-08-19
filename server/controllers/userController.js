@@ -142,7 +142,7 @@ const loginUser = async (req, res) => {
                   }
                 );
                 res.cookie('token', refreshToken, { httpOnly: true });
-                res.status(201).json({
+                res.status(200).json({
                   message: 'Login successful',
                   email: data.email,
                   userName: user[0].userName,
@@ -186,7 +186,7 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     res.clearCookie('token');
-    res.status(201).json({
+    res.status(200).json({
       message: 'Logout successful',
     });
   } catch (err) {
@@ -210,7 +210,7 @@ const deleteUser = async (req, res) => {
       .then((data) => {
         console.log(data);
         if (data.n === 1) {
-          res.status(201).json({
+          res.status(200).json({
             message: 'Account deleted successfully',
           });
         } else {
@@ -237,7 +237,7 @@ const getInfo = async (req, res) => {
     .exec()
     .then((user) => {
       if (user.length >= 1) {
-        res.status(201).json({
+        res.status(200).json({
           email: user[0].email,
           userName: user[0].userName,
           firstName: user[0].firstName,

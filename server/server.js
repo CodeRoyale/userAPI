@@ -40,7 +40,7 @@ const app = express();
 // middlewares
 app.use(cookieParser());
 
-const whitelist = ['http://localhost:3000', 'https://codeRoyale.herokuapp.com'];
+const whitelist = ['http://localhost:5000', 'https://codeRoyale.herokuapp.com'];
 const corsOptions = {
   origin: function (origin, callback) {
     // add !origin for services like postman
