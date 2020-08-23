@@ -1,7 +1,16 @@
 // basic setting up
 /* eslint-disable global-require */
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+const passport = require('passport');
+const FacebookTokenStrategy = require('passport-facebook-token');
 /* eslint-enable global-require */
+
+/* eslint-disable */
+const [FACEBOOK_APP_ID, FACEBOOK_APP_SECRET] = [
+  process.env.FACEBOOK_APP_ID || secrets.FACEBOOK_APP_ID,
+  process.env.FACEBOOK_APP_SECRET || secrets.FACEBOOK_APP_SECRET,
+];
+/* eslint-enable */
 
 const PORT = process.env.PORT || 5000;
 
@@ -37,6 +46,42 @@ const path = require('path');
 
 const app = express();
 
+/* passport setup */
+app.use(passport.initialize());
+
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+  done(null, user);
+});
+
+/* passport-facebook-token setup */
+passport.use(
+  new FacebookTokenStrategy(
+    {
+      clientID: FACEBOOK_APP_ID,
+      clientSecret: FACEBOOK_APP_SECRET,
+      fbGraphVersion: 'v3.0',
+    },
+    function (accessToken, refreshToken, profile, done) {
+      /* eslint-disable */
+      const user = {
+        id: profile._json.id,
+        last_name: profile._json.last_name,
+        first_name: profile._json.first_name,
+        email: profile._json.email,
+        picture: profile.photos[0].value,
+      };
+      /* eslint-enable */
+
+      // console.log(user);
+      return done(null, user);
+    }
+  )
+);
+
 // middlewares
 app.use(cookieParser());
 
@@ -62,6 +107,7 @@ app.use(express.json());
 app.use('/', require('./routes/main'));
 app.use('/users', require('./routes/users'));
 app.use('/token', require('./middlerwares/accessTokenGenerator'));
+app.use('/facebook', require('./utils/facebookAuth'));
 
 // start listening
 const server = app.listen(PORT, () => {

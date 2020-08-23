@@ -1,5 +1,6 @@
 const googleAuth = require('google-auth-library');
 const jwt = require('jsonwebtoken');
+const fetch = require('node-fetch');
 const User = require('../models/user');
 
 // secret keys and secret times
@@ -10,12 +11,14 @@ const [
   REFRESH_SECRECT_KEY,
   REFRESH_SECRECT_TIME,
   CLIENT_ID,
+  FACEBOOK_APP_URL,
 ] = [
   process.env.ACCESS_SECRECT_KEY || secrets.ACCESS_SECRECT_KEY,
   process.env.ACCESS_SECRECT_TIME || secrets.ACCESS_SECRECT_TIME,
   process.env.REFRESH_SECRECT_KEY || secrets.REFRESH_SECRECT_KEY,
   process.env.REFRESH_SECRECT_TIME || secrets.REFRESH_SECRECT_TIME,
   process.env.CLIENT_ID || secrets.CLIENT_ID,
+  process.env.FACEBOOK_APP_URL || secrets.FACEBOOK_APP_URL,
 ];
 /* eslint-enable */
 
@@ -25,7 +28,7 @@ let thirdPartyData;
 const client = new OAuth2Client(CLIENT_ID);
 async function verify() {
   const ticket = await client.verifyIdToken({
-    idToken: thirdPartyData.idToken,
+    idToken: thirdPartyData.access_token,
     audience: CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
     // Or, if multiple clients access the backend:
     // [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
@@ -96,6 +99,60 @@ const signupUser = async (req, res) => {
             message: 'Invalid token signature',
           });
         });
+    } else if (thirdPartyData.issuer === 'facebook') {
+      const data = {
+        access_token: req.body.access_token,
+      };
+      const url = FACEBOOK_APP_URL;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+
+      await User.find({ email: result.user.email })
+        .exec()
+        /* eslint-disable consistent-return */
+        .then((user) => {
+          if (user.length >= 1) {
+            return res.status(409).json({
+              message: 'User Already Exists',
+            });
+          }
+          const newUser = new User({
+            userName: result.user.first_name + result.user.id,
+            firstName: result.user.first_name,
+            lastName: result.user.last_name,
+            email: result.user.email,
+            issuer: thirdPartyData.issuer,
+            signUpType: thirdPartyData.signUpType,
+            profilePic: {
+              url: result.user.picture,
+            },
+          });
+          newUser
+            .save()
+            .then(() => {
+              res.status(201).json({
+                message: 'User Account Created',
+              });
+            })
+            .catch(() => {
+              res.status(401).json({
+                message: 'Required field missing or Username is in use',
+              });
+            });
+        })
+        /* eslint-enable consistent-return */
+        .catch((err) => {
+          res.status(500).json({
+            error: err,
+          });
+        });
     } else {
       res.status(401).json({
         message: 'Unrecognized data !',
@@ -142,7 +199,7 @@ const loginUser = async (req, res) => {
                   }
                 );
                 res.cookie('token', refreshToken, { httpOnly: true });
-                res.status(201).json({
+                res.status(200).json({
                   message: 'Login successful',
                   email: data.email,
                   userName: user[0].userName,
@@ -169,6 +226,67 @@ const loginUser = async (req, res) => {
             message: 'Invalid token signature',
           });
         });
+    } else if (thirdPartyData.issuer === 'facebook') {
+      const data = {
+        access_token: req.body.access_token,
+      };
+      const url = FACEBOOK_APP_URL;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      await User.find({ email: result.user.email })
+        .exec()
+        .then((user) => {
+          if (user.length >= 1) {
+            const accessToken = jwt.sign(
+              {
+                email: user[0].email,
+                userName: user[0].userName,
+              },
+              ACCESS_SECRECT_KEY,
+              {
+                expiresIn: ACCESS_SECRECT_TIME,
+              }
+            );
+            const refreshToken = jwt.sign(
+              {
+                email: user[0].email,
+                userName: user[0].userName,
+                name: user[0].name,
+              },
+              REFRESH_SECRECT_KEY,
+              {
+                expiresIn: REFRESH_SECRECT_TIME,
+              }
+            );
+            res.cookie('token', refreshToken, { httpOnly: true });
+            res.status(200).json({
+              message: 'Login successful',
+              email: result.user.email,
+              userName: user[0].userName,
+              firstName: user[0].firstName,
+              lastName: user[0].lastName,
+              picture: user[0].profilePic.url,
+              accessToken: accessToken,
+            });
+          } else {
+            res.status(401).json({
+              message: "User Doesn't Exists",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json({
+            error: 'Server Error',
+          });
+        });
     } else {
       res.status(401).json({
         message: 'Unrecognized data !',
@@ -186,7 +304,7 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     res.clearCookie('token');
-    res.status(201).json({
+    res.status(200).json({
       message: 'Logout successful',
     });
   } catch (err) {
@@ -210,7 +328,7 @@ const deleteUser = async (req, res) => {
       .then((data) => {
         console.log(data);
         if (data.n === 1) {
-          res.status(201).json({
+          res.status(200).json({
             message: 'Account deleted successfully',
           });
         } else {
@@ -221,7 +339,7 @@ const deleteUser = async (req, res) => {
       })
       .catch(() => {
         res.status(401).json({
-          message: 'Account not sound',
+          message: 'Account not found',
         });
       });
   } catch (err) {
@@ -237,7 +355,7 @@ const getInfo = async (req, res) => {
     .exec()
     .then((user) => {
       if (user.length >= 1) {
-        res.status(201).json({
+        res.status(200).json({
           email: user[0].email,
           userName: user[0].userName,
           firstName: user[0].firstName,
