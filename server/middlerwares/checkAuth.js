@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
   } catch (error) {
     // token was expired or user had made changes in the token
     res.status(401).json({
-      message: 'Auth failed',
+      message: 'Token Expired',
     });
   }
 };

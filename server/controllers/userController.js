@@ -1,6 +1,7 @@
-const googleAuth = require('google-auth-library');
 const jwt = require('jsonwebtoken');
+const fetch = require('node-fetch');
 const User = require('../models/user');
+const { googleAuth } = require('../utils/googleAuth');
 
 // secret keys and secret times
 /* eslint-disable */
@@ -9,46 +10,50 @@ const [
   ACCESS_SECRECT_TIME,
   REFRESH_SECRECT_KEY,
   REFRESH_SECRECT_TIME,
-  CLIENT_ID,
+  FACEBOOK_APP_URL,
 ] = [
   process.env.ACCESS_SECRECT_KEY || secrets.ACCESS_SECRECT_KEY,
   process.env.ACCESS_SECRECT_TIME || secrets.ACCESS_SECRECT_TIME,
   process.env.REFRESH_SECRECT_KEY || secrets.REFRESH_SECRECT_KEY,
   process.env.REFRESH_SECRECT_TIME || secrets.REFRESH_SECRECT_TIME,
-  process.env.CLIENT_ID || secrets.CLIENT_ID,
+  process.env.FACEBOOK_APP_URL || secrets.FACEBOOK_APP_URL,
 ];
 /* eslint-enable */
 
-// Using a Google API Client Library for verify idToken send by frontend
-const { OAuth2Client } = googleAuth;
-let thirdPartyData;
-const client = new OAuth2Client(CLIENT_ID);
-async function verify() {
-  const ticket = await client.verifyIdToken({
-    idToken: thirdPartyData.idToken,
-    audience: CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
-    // Or, if multiple clients access the backend:
-    // [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
-  });
-  const payload = ticket.getPayload();
-  // uncomment userid when it's in use
-  // const userid = payload.sub;
-  // TO LOG THE ERROR
-  //   verify().catch(console.error);
-  if (payload.aud !== CLIENT_ID) {
-    throw new Error('Invalid token signature');
-  } else {
-    return payload;
-  }
+function tokenGenerator(user) {
+  const accToken = jwt.sign(
+    {
+      email: user.email,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      picture: user.profilePic.url,
+    },
+    ACCESS_SECRECT_KEY,
+    {
+      expiresIn: ACCESS_SECRECT_TIME,
+    }
+  );
+  const refToken = jwt.sign(
+    {
+      email: user.email,
+      userName: user.userName,
+      firstName: user.firstName,
+    },
+    REFRESH_SECRECT_KEY,
+    {
+      expiresIn: REFRESH_SECRECT_TIME,
+    }
+  );
+  return [accToken, refToken];
 }
 
 // signup
 const signupUser = async (req, res) => {
   // more changes might come because we have to check for unique username too
   try {
-    thirdPartyData = req.body;
-    if (thirdPartyData.issuer === 'google') {
-      verify()
+    if (req.body.issuer === 'google') {
+      googleAuth(req.body.access_token)
         .then(async (data) => {
           await User.find({ email: data.email })
             .exec()
@@ -60,12 +65,12 @@ const signupUser = async (req, res) => {
                 });
               }
               const newUser = new User({
-                userName: data.given_name + data.iat,
+                userName: (data.given_name + data.iat).replace(/ /g, ''),
                 firstName: data.given_name,
                 lastName: data.family_name,
                 email: data.email,
-                issuer: thirdPartyData.issuer,
-                signUpType: thirdPartyData.signUpType,
+                issuer: req.body.issuer,
+                signUpType: req.body.signUpType,
                 profilePic: {
                   public_id: data.sub,
                   url: data.picture,
@@ -78,7 +83,8 @@ const signupUser = async (req, res) => {
                     message: 'User Account Created',
                   });
                 })
-                .catch(() => {
+                .catch((err) => {
+                  console.log(err);
                   res.status(401).json({
                     message: 'Required field missing or Username is in use',
                   });
@@ -96,6 +102,60 @@ const signupUser = async (req, res) => {
             message: 'Invalid token signature',
           });
         });
+    } else if (req.body.issuer === 'facebook') {
+      const data = {
+        access_token: req.body.access_token,
+      };
+      const url = FACEBOOK_APP_URL;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+
+      await User.find({ email: result.user.email })
+        .exec()
+        /* eslint-disable consistent-return */
+        .then((user) => {
+          if (user.length >= 1) {
+            return res.status(409).json({
+              message: 'User Already Exists',
+            });
+          }
+          const newUser = new User({
+            userName: result.user.first_name + result.user.id,
+            firstName: result.user.first_name,
+            lastName: result.user.last_name,
+            email: result.user.email,
+            issuer: req.body.issuer,
+            signUpType: req.body.signUpType,
+            profilePic: {
+              url: result.user.picture,
+            },
+          });
+          newUser
+            .save()
+            .then(() => {
+              res.status(201).json({
+                message: 'User Account Created',
+              });
+            })
+            .catch(() => {
+              res.status(401).json({
+                message: 'Required field missing or Username is in use',
+              });
+            });
+        })
+        /* eslint-enable consistent-return */
+        .catch((err) => {
+          res.status(500).json({
+            error: err,
+          });
+        });
     } else {
       res.status(401).json({
         message: 'Unrecognized data !',
@@ -111,44 +171,17 @@ const signupUser = async (req, res) => {
 // login
 const loginUser = async (req, res) => {
   try {
-    thirdPartyData = req.body;
-
-    if (thirdPartyData.issuer === 'google') {
-      verify()
+    if (req.body.issuer === 'google') {
+      googleAuth(req.body.access_token)
         .then(async (data) => {
           await User.find({ email: data.email })
             .exec()
             .then((user) => {
               if (user.length >= 1) {
-                const accessToken = jwt.sign(
-                  {
-                    email: user[0].email,
-                    userName: user[0].userName,
-                  },
-                  ACCESS_SECRECT_KEY,
-                  {
-                    expiresIn: ACCESS_SECRECT_TIME,
-                  }
-                );
-                const refreshToken = jwt.sign(
-                  {
-                    email: user[0].email,
-                    userName: user[0].userName,
-                    name: user[0].name,
-                  },
-                  REFRESH_SECRECT_KEY,
-                  {
-                    expiresIn: REFRESH_SECRECT_TIME,
-                  }
-                );
+                const [accessToken, refreshToken] = tokenGenerator(user[0]);
                 res.cookie('token', refreshToken, { httpOnly: true });
-                res.status(201).json({
+                res.status(200).json({
                   message: 'Login successful',
-                  email: data.email,
-                  userName: user[0].userName,
-                  firstName: user[0].firstName,
-                  lastName: user[0].lastName,
-                  picture: data.picture,
                   accessToken: accessToken,
                 });
               } else {
@@ -169,6 +202,42 @@ const loginUser = async (req, res) => {
             message: 'Invalid token signature',
           });
         });
+    } else if (req.body.issuer === 'facebook') {
+      const data = {
+        access_token: req.body.access_token,
+      };
+      const url = FACEBOOK_APP_URL;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      await User.find({ email: result.user.email })
+        .exec()
+        .then((user) => {
+          if (user.length >= 1) {
+            const [accessToken, refreshToken] = tokenGenerator(user[0]);
+            res.cookie('token', refreshToken, { httpOnly: true });
+            res.status(200).json({
+              message: 'Login successful',
+              accessToken: accessToken,
+            });
+          } else {
+            res.status(401).json({
+              message: "User Doesn't Exists",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json({
+            error: 'Server Error',
+          });
+        });
     } else {
       res.status(401).json({
         message: 'Unrecognized data !',
@@ -186,7 +255,7 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     res.clearCookie('token');
-    res.status(201).json({
+    res.status(200).json({
       message: 'Logout successful',
     });
   } catch (err) {
@@ -210,7 +279,7 @@ const deleteUser = async (req, res) => {
       .then((data) => {
         console.log(data);
         if (data.n === 1) {
-          res.status(201).json({
+          res.status(200).json({
             message: 'Account deleted successfully',
           });
         } else {
@@ -221,7 +290,7 @@ const deleteUser = async (req, res) => {
       })
       .catch(() => {
         res.status(401).json({
-          message: 'Account not sound',
+          message: 'Account not found',
         });
       });
   } catch (err) {
@@ -237,7 +306,7 @@ const getInfo = async (req, res) => {
     .exec()
     .then((user) => {
       if (user.length >= 1) {
-        res.status(201).json({
+        res.status(200).json({
           email: user[0].email,
           userName: user[0].userName,
           firstName: user[0].firstName,
