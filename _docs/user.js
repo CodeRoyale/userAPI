@@ -10,47 +10,54 @@
  * @swagger
  *  components:
  *    schemas:
- *      User:
+ *      signup:
  *        type: object
  *        required:
- *          - userName
- *          - firstName
- *          - lastName
- *          - email
- *          - password
  *          - issuer
  *          - signUpType
- *          - profilePic
+ *          - access_token 
  *        properties:
- *          userName:
- *            type: string
- *            description: Username of the user
- *          firstName:
- *            type: string
- *            description: First Name Of the User
- *          lastName:
- *            type: string
- *            description: Last Name Of the User
- *          email:
- *            type: string
- *            description: E-mail address of the User
- *          password:
- *            type: strings
- *            description: Password of the User
  *          issuer:
  *            type: string
  *            description: Third-party application used for signup/login
  *          signUpType:
  *            type: string
  *            description: Mode of Signup
- *          profilePic:
+ *          access_token:
  *            type: string
- *            description: Profile picture of the user
+ *            description: Token for Signup
  *
  *        example:
  *           issuer: "google"
- *           signUpType: "native"
+ *           signUpType: "OAuth"
  *           idToken: "eyJhbGciOiJSUzI1NiIsImtpZCI6ImYwNTQxNWIxM2FjYjk1OTBmNzBkZjg2Mjc2NWM2NTVmNWE3YTAxOWUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTAxMTIxNTkwMzU0OS1nazA0cHF1cWd0YmtrZWZ0OHJ2a2VkMGViMDhsa3M2MS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6IjEwMTEyMTU5MDM1NDktZ2swNHBxdXFndGJra2VmdDhydmtlZDBlYjA4bGtzNjEuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDk2NTYyMjg5MTE3NzU4MjAyOTciLCJlbWFpbCI6ImpvZWxtYXRoZXdrb3NoeUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6ImVYUUlkWmpGWDdGRDQ4blNaV3E3c0EiLCJuYW1lIjoiSm9lbCBNYXRoZXciLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EtL0FPaDE0R2hiLUxfYW9acllIcGZHMTE0MUlUWW1TTEh3MUx2NG5wSHlZZF9zZUE9czk2LWMiLCJnaXZlbl9uYW1lIjoiSm9lbCIsImZhbWlseV9uYW1lIjoiTWF0aGV3IiwibG9jYWxlIjoiZW4iLCJpYXQiOjE1OTYyNzE2MjEsImV4cCI6MTU5NjI3NTIyMSwianRpIjoiZWI1YWVmZTM1YWMyZGNhZGQ5YTMwMzRlN2U4YjA3NWJhNjNjMjYyNCJ9.eoozJ7l6BV-q7s7nGRq_xjz1ijQ3EyYlryKisXAadYGCABZIu9C65GypvXkCxHq5OoZEp3wWy7mj5Z-bxUGDSJ8_l3z4l6FeOKoTaNvKwhHzYEkb0L6yHKQatvi8tcLYJSafTWgOjYsDyoh92r5X_BM4zMg60HIS6BeMPpg8NzLxOy3l14TTD4wu3nxtaQxPIwJBgABA2XOhb3jsi7qFWiZWtLkUa36_mYSjf3Ii1uAl7ITs5Jbpi4wdKjQqA-B9URmgzvySHq7GBjkHa4Md4tJ5Cee-yZSRT8Hd4WfuxZPghVcI-Wo-uPOuDBnlxI8IGu1TtxbpErMxDyrfg-JvyA"
+ *      login:
+ *        type: object
+ *        required:
+ *          - issuer
+ *          - access_token
+ *        properties:
+ *          issuer:
+ *            type: string
+ *            description: Third-party application used for signup/login
+ *          access_token:
+ *            type: string
+ *            description: Token for Signup
+ *
+ *        example:
+ *           issuer: "google"
+ *           idToken: "eyJhbGciOiJSUzI1NiIsImtpZCI6ImYwNTQxNWIxM2FjYjk1OTBmNzBkZjg2Mjc2NWM2NTVmNWE3YTAxOWUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMTAxMTIxNTkwMzU0OS1nazA0cHF1cWd0YmtrZWZ0OHJ2a2VkMGViMDhsa3M2MS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImF1ZCI6IjEwMTEyMTU5MDM1NDktZ2swNHBxdXFndGJra2VmdDhydmtlZDBlYjA4bGtzNjEuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDk2NTYyMjg5MTE3NzU4MjAyOTciLCJlbWFpbCI6ImpvZWxtYXRoZXdrb3NoeUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6ImVYUUlkWmpGWDdGRDQ4blNaV3E3c0EiLCJuYW1lIjoiSm9lbCBNYXRoZXciLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EtL0FPaDE0R2hiLUxfYW9acllIcGZHMTE0MUlUWW1TTEh3MUx2NG5wSHlZZF9zZUE9czk2LWMiLCJnaXZlbl9uYW1lIjoiSm9lbCIsImZhbWlseV9uYW1lIjoiTWF0aGV3IiwibG9jYWxlIjoiZW4iLCJpYXQiOjE1OTYyNzE2MjEsImV4cCI6MTU5NjI3NTIyMSwianRpIjoiZWI1YWVmZTM1YWMyZGNhZGQ5YTMwMzRlN2U4YjA3NWJhNjNjMjYyNCJ9.eoozJ7l6BV-q7s7nGRq_xjz1ijQ3EyYlryKisXAadYGCABZIu9C65GypvXkCxHq5OoZEp3wWy7mj5Z-bxUGDSJ8_l3z4l6FeOKoTaNvKwhHzYEkb0L6yHKQatvi8tcLYJSafTWgOjYsDyoh92r5X_BM4zMg60HIS6BeMPpg8NzLxOy3l14TTD4wu3nxtaQxPIwJBgABA2XOhb3jsi7qFWiZWtLkUa36_mYSjf3Ii1uAl7ITs5Jbpi4wdKjQqA-B9URmgzvySHq7GBjkHa4Md4tJ5Cee-yZSRT8Hd4WfuxZPghVcI-Wo-uPOuDBnlxI8IGu1TtxbpErMxDyrfg-JvyA"
+ *      getinfo:
+ *        type: object
+ *        required:
+ *          - email
+ *        properties:
+ *          email:
+ *            type: string
+ *            description: Email of the User
+ *
+ *        example:
+ *           email: "donaldabraham@karunya.edu.in"
  */
 // Components used in the responses
 /**
@@ -283,7 +290,7 @@
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/signup'
  *      responses:
  *        "201":
  *          description: Create a new User
@@ -324,7 +331,7 @@
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/login'
  *      responses:
  *        "200":
  *          description: Logged IN
@@ -355,12 +362,6 @@
  *    get:
  *      summary: LOGOUT
  *      tags: [User]
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
  *      responses:
  *        "200":
  *          description: Logged Out
@@ -380,12 +381,6 @@
  *    delete:
  *      summary: DELETE
  *      tags: [User]
- *      requestBody:
- *        required: true
- *        content:
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/User'
  *      responses:
  *        "200":
  *          description: Deleted User
@@ -422,7 +417,7 @@
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/User'
+ *              $ref: '#/components/schemas/getinfo'
  *      responses:
  *        "200":
  *          description: Info
