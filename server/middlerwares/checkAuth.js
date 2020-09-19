@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const RESPONSE = require('../utils/constantResponse');
 
 // secret keys and secret times
 /* eslint-disable */
@@ -20,8 +21,11 @@ module.exports = (req, res, next) => {
     return;
   } catch (error) {
     // token was expired or user had made changes in the token
-    res.status(401).json({
-      message: 'Token Expired',
+    res.status(403).json({
+      status: false,
+      payload: {
+        message: RESPONSE.ERRORTOKEN,
+      },
     });
   }
 };
