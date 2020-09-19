@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const RESPONSE = require('../utils/constantResponse');
 
 const router = express.Router();
 
@@ -16,8 +17,11 @@ const [ACCESS_SECRECT_KEY, ACCESS_SECRECT_TIME, REFRESH_SECRECT_KEY] = [
 router.post('/', (req, res) => {
   try {
     if (!req.cookies.token) {
-      return res.status(401).json({
-        message: 'Login Required',
+      return res.status(403).json({
+        status: false,
+        payload: {
+          message: RESPONSE.LOGINREQUIRED,
+        },
       });
     }
     // console.log(req.cookies.token);
@@ -38,14 +42,20 @@ router.post('/', (req, res) => {
         expiresIn: ACCESS_SECRECT_TIME,
       }
     );
-    return res.status(201).json({
-      message: 'Access token',
-      accessToken: accessToken,
+    return res.status(200).json({
+      status: true,
+      payload: {
+        message: RESPONSE.TOKEN,
+        accessToken: accessToken,
+      },
     });
   } catch (error) {
     // token was expired or user had made changes in the token
     return res.status(401).json({
-      message: 'Token Expired',
+      status: false,
+      payload: {
+        message: RESPONSE.AUTHERROR,
+      },
     });
   }
 });

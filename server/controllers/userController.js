@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
 const User = require('../models/user');
 const { googleAuth } = require('../utils/googleAuth');
+const RESPONSE = require('../utils/constantResponse');
 
 // secret keys and secret times
 /* eslint-disable */
@@ -59,9 +60,12 @@ const signupUser = async (req, res) => {
             .exec()
             /* eslint-disable consistent-return */
             .then((user) => {
-              if (user.length >= 1) {
+              if (user.length === 1) {
                 return res.status(409).json({
-                  message: 'User Already Exists',
+                  status: true,
+                  payload: {
+                    message: RESPONSE.CONFLICT,
+                  },
                 });
               }
               const newUser = new User({
@@ -80,26 +84,37 @@ const signupUser = async (req, res) => {
                 .save()
                 .then(() => {
                   res.status(201).json({
-                    message: 'User Account Created',
+                    status: true,
+                    payload: {
+                      message: RESPONSE.CREATED,
+                    },
                   });
                 })
-                .catch((err) => {
-                  console.log(err);
-                  res.status(401).json({
-                    message: 'Required field missing or Username is in use',
+                .catch(() => {
+                  res.status(406).json({
+                    status: false,
+                    payload: {
+                      message: RESPONSE.MISSING,
+                    },
                   });
                 });
             })
             /* eslint-enable consistent-return */
-            .catch((err) => {
+            .catch(() => {
               res.status(500).json({
-                error: err,
+                status: false,
+                payload: {
+                  message: RESPONSE.ERROR,
+                },
               });
             });
         })
         .catch(() => {
           res.status(401).json({
-            message: 'Invalid token signature',
+            status: false,
+            payload: {
+              message: RESPONSE.ERRORTOKEN,
+            },
           });
         });
     } else if (req.body.issuer === 'facebook') {
@@ -123,7 +138,10 @@ const signupUser = async (req, res) => {
         .then((user) => {
           if (user.length >= 1) {
             return res.status(409).json({
-              message: 'User Already Exists',
+              status: false,
+              payload: {
+                message: RESPONSE.CONFLICT,
+              },
             });
           }
           const newUser = new User({
@@ -141,29 +159,44 @@ const signupUser = async (req, res) => {
             .save()
             .then(() => {
               res.status(201).json({
-                message: 'User Account Created',
+                status: true,
+                payload: {
+                  message: RESPONSE.CREATED,
+                },
               });
             })
             .catch(() => {
-              res.status(401).json({
-                message: 'Required field missing or Username is in use',
+              res.status(406).json({
+                status: false,
+                payload: {
+                  message: RESPONSE.MISSING,
+                },
               });
             });
         })
         /* eslint-enable consistent-return */
-        .catch((err) => {
+        .catch(() => {
           res.status(500).json({
-            error: err,
+            status: false,
+            payload: {
+              message: RESPONSE.ERROR,
+            },
           });
         });
     } else {
-      res.status(401).json({
-        message: 'Unrecognized data !',
+      res.status(406).json({
+        status: false,
+        payload: {
+          message: RESPONSE.INVALID,
+        },
       });
     }
-  } catch (err) {
-    res.status(401).json({
-      message: err.message,
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      payload: {
+        message: RESPONSE.ERROR,
+      },
     });
   }
 };
@@ -181,25 +214,36 @@ const loginUser = async (req, res) => {
                 const [accessToken, refreshToken] = tokenGenerator(user[0]);
                 res.cookie('token', refreshToken, { httpOnly: true });
                 res.status(200).json({
-                  message: 'Login successful',
-                  accessToken: accessToken,
+                  status: true,
+                  payload: {
+                    message: RESPONSE.LOGIN,
+                    accessToken: accessToken,
+                  },
                 });
               } else {
-                res.status(401).json({
-                  message: "User Doesn't Exists",
+                res.status(403).json({
+                  status: false,
+                  payload: {
+                    message: RESPONSE.REGISTER,
+                  },
                 });
               }
             })
-            .catch((err) => {
-              console.log(err);
+            .catch(() => {
               res.status(500).json({
-                error: 'Server Error',
+                status: false,
+                payload: {
+                  message: RESPONSE.ERROR,
+                },
               });
             });
         })
         .catch(() => {
           res.status(401).json({
-            message: 'Invalid token signature',
+            status: false,
+            payload: {
+              message: RESPONSE.ERRORTOKEN,
+            },
           });
         });
     } else if (req.body.issuer === 'facebook') {
@@ -219,34 +263,47 @@ const loginUser = async (req, res) => {
       await User.find({ email: result.user.email })
         .exec()
         .then((user) => {
-          if (user.length >= 1) {
+          if (user.length === 1) {
             const [accessToken, refreshToken] = tokenGenerator(user[0]);
             res.cookie('token', refreshToken, { httpOnly: true });
             res.status(200).json({
-              message: 'Login successful',
-              accessToken: accessToken,
+              status: true,
+              payload: {
+                message: RESPONSE.LOGIN,
+                accessToken: accessToken,
+              },
             });
           } else {
-            res.status(401).json({
-              message: "User Doesn't Exists",
+            res.status(403).json({
+              status: false,
+              payload: {
+                message: RESPONSE.REGISTER,
+              },
             });
           }
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
           res.status(500).json({
-            error: 'Server Error',
+            status: false,
+            payload: {
+              message: RESPONSE.ERROR,
+            },
           });
         });
     } else {
-      res.status(401).json({
-        message: 'Unrecognized data !',
+      res.status(406).json({
+        status: false,
+        payload: {
+          message: RESPONSE.INVALID,
+        },
       });
     }
-  } catch (err) {
-    console.log(err);
-    res.status(401).json({
-      message: err.message,
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      payload: {
+        message: RESPONSE.ERROR,
+      },
     });
   }
 };
@@ -256,11 +313,17 @@ const logoutUser = async (req, res) => {
   try {
     res.clearCookie('token');
     res.status(200).json({
-      message: 'Logout successful',
+      status: true,
+      payload: {
+        message: RESPONSE.LOGOUT,
+      },
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).json({
-      message: 'Server Error',
+      status: false,
+      payload: {
+        message: RESPONSE.ERROR,
+      },
     });
   }
 };
@@ -277,25 +340,36 @@ const deleteUser = async (req, res) => {
     User.deleteOne({ userName: payloadData.userName })
       .exec()
       .then((data) => {
-        console.log(data);
         if (data.n === 1) {
           res.status(200).json({
-            message: 'Account deleted successfully',
+            status: true,
+            payload: {
+              message: RESPONSE.DELETED,
+            },
           });
         } else {
-          res.status(409).json({
-            message: "Account dosen't exist",
+          res.status(403).json({
+            status: false,
+            payload: {
+              message: RESPONSE.REGISTER,
+            },
           });
         }
       })
       .catch(() => {
-        res.status(401).json({
-          message: 'Account not found',
+        res.status(500).json({
+          status: false,
+          payload: {
+            message: RESPONSE.ERROR,
+          },
         });
       });
   } catch (err) {
     res.status(500).json({
-      message: 'Server Error',
+      status: false,
+      payload: {
+        message: RESPONSE.ERROR,
+      },
     });
   }
 };
@@ -305,23 +379,33 @@ const getInfo = async (req, res) => {
   await User.find({ email: req.body.email })
     .exec()
     .then((user) => {
-      if (user.length >= 1) {
+      if (user.length === 1) {
         res.status(200).json({
-          email: user[0].email,
-          userName: user[0].userName,
-          firstName: user[0].firstName,
-          lastName: user[0].lastName,
-          picture: user[0].profilePic.url,
+          status: true,
+          payload: {
+            message: RESPONSE.INFO,
+            email: user[0].email,
+            userName: user[0].userName,
+            firstName: user[0].firstName,
+            lastName: user[0].lastName,
+            picture: user[0].profilePic.url,
+          },
         });
       } else {
-        res.status(401).json({
-          message: "User Doesn't Exists",
+        res.status(403).json({
+          status: false,
+          payload: {
+            message: RESPONSE.REGISTER,
+          },
         });
       }
     })
     .catch(() => {
       res.status(500).json({
-        message: 'Server Error',
+        status: false,
+        payload: {
+          message: RESPONSE.ERROR,
+        },
       });
     });
 };

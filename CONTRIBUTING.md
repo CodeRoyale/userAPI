@@ -97,6 +97,15 @@
 
   - Be explicit about what you want feedback on, or why you are asking for specific reviewers.
 
+## Status Codes used in API
+ - `201` Created
+ - `200` Success
+ - `401` Not Authorization
+ - `403` Access to that resource is forbidden
+ - `406` Acceptable values are undefined in the request
+ - `409` Coflict Error
+ - `500` Server Error
+
 ## How to document API
 
 - Follow the order to keep the documentation clear and clean
