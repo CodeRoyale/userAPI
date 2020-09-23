@@ -36,6 +36,9 @@ router.post('/', (req, res) => {
       {
         email: payLoadData.email,
         userName: payLoadData.userName,
+        firstName: payLoadData.firstName,
+        lastName: payLoadData.lastName,
+        picture: payLoadData.picture,
       },
       ACCESS_SECRECT_KEY,
       {
