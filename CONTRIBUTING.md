@@ -30,7 +30,8 @@
     - 🐛 Bugfix
     - 📇 Metadata
     - 📚 Documentation
-    - 💡 Documenting source code
+    - 📗 Documenting source code
+    - 💡 Improve code logic
     - 🐎 Performance
     - 💄 Cosmetic
     - 🚨 Tests

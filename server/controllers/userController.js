@@ -183,6 +183,60 @@ const signupUser = async (req, res) => {
             },
           });
         });
+    } else if (req.body.issuer === 'facebook') {
+      const data = {
+        access_token: req.body.access_token,
+      };
+      const url = FACEBOOK_APP_URL;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+
+      await User.find({ email: result.user.email })
+        .exec()
+        /* eslint-disable consistent-return */
+        .then((user) => {
+          if (user.length >= 1) {
+            return res.status(409).json({
+              message: 'User Already Exists',
+            });
+          }
+          const newUser = new User({
+            userName: result.user.first_name + result.user.id,
+            firstName: result.user.first_name,
+            lastName: result.user.last_name,
+            email: result.user.email,
+            issuer: req.body.issuer,
+            signUpType: req.body.signUpType,
+            profilePic: {
+              url: result.user.picture,
+            },
+          });
+          newUser
+            .save()
+            .then(() => {
+              res.status(201).json({
+                message: 'User Account Created',
+              });
+            })
+            .catch(() => {
+              res.status(401).json({
+                message: 'Required field missing or Username is in use',
+              });
+            });
+        })
+        /* eslint-enable consistent-return */
+        .catch((err) => {
+          res.status(500).json({
+            error: err,
+          });
+        });
     } else {
       res.status(406).json({
         status: false,
@@ -288,6 +342,42 @@ const loginUser = async (req, res) => {
             payload: {
               message: RESPONSE.ERROR,
             },
+          });
+        });
+    } else if (req.body.issuer === 'facebook') {
+      const data = {
+        access_token: req.body.access_token,
+      };
+      const url = FACEBOOK_APP_URL;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      await User.find({ email: result.user.email })
+        .exec()
+        .then((user) => {
+          if (user.length >= 1) {
+            const [accessToken, refreshToken] = tokenGenerator(user[0]);
+            res.cookie('token', refreshToken, { httpOnly: true });
+            res.status(200).json({
+              message: 'Login successful',
+              accessToken: accessToken,
+            });
+          } else {
+            res.status(401).json({
+              message: "User Doesn't Exists",
+            });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json({
+            error: 'Server Error',
           });
         });
     } else {
