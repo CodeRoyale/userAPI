@@ -40,6 +40,9 @@ function tokenGenerator(user) {
       email: user.email,
       userName: user.userName,
       firstName: user.firstName,
+      lastName: user.lastName,
+      picture: user.profilePic.url,
+      signUpType: user.signUpType,
     },
     REFRESH_SECRECT_KEY,
     {
@@ -500,4 +503,37 @@ const getInfo = async (req, res) => {
     });
 };
 
-module.exports = { signupUser, loginUser, logoutUser, deleteUser, getInfo };
+const profileUpdate = async (req, res) => {
+  const data = {};
+  if (req.body.firstName) data.firstName = req.body.firstName;
+  if (req.body.lastName) data.lastName = req.body.lastName;
+  if (req.body.userName) data.userName = req.body.userName;
+
+  await User.findOneAndUpdate(req.data.email, data)
+    .exec()
+    .then(() => {
+      res.status(200).json({
+        status: true,
+        payload: {
+          message: RESPONSE.UPDATE,
+        },
+      });
+    })
+    .catch(() => {
+      res.status(500).json({
+        status: false,
+        payload: {
+          message: RESPONSE.ERROR,
+        },
+      });
+    });
+};
+
+module.exports = {
+  signupUser,
+  loginUser,
+  logoutUser,
+  deleteUser,
+  getInfo,
+  profileUpdate,
+};
