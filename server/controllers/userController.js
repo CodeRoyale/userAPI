@@ -469,7 +469,7 @@ const deleteUser = async (req, res) => {
 
 // getinfo
 const getInfo = async (req, res) => {
-  await User.find({ email: req.body.email })
+  await User.find({ email: req.param.email })
     .exec()
     .then((user) => {
       if (user.length === 1) {
@@ -530,7 +530,7 @@ const profileUpdate = async (req, res) => {
 };
 
 const userNameAvailability = async (req, res) => {
-  await User.find(req.data.userName)
+  await User.find(req.param.userName)
     .exec()
     .then((user) => {
       if (user.length === 0) {
