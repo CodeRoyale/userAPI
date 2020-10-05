@@ -520,7 +520,8 @@ const profileUpdate = async (req, res) => {
           firstName: updatedData.firstName,
           lastName: updatedData.lastName,
           userName: updatedData.userName,
-          profilePic: updatedData.profilePic.url
+          profilePic: updatedData.profilePic.url,
+          email: updatedData.email,
         },
       });
     })
