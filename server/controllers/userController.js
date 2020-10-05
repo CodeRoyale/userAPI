@@ -508,14 +508,19 @@ const profileUpdate = async (req, res) => {
   if (req.body.firstName) data.firstName = req.body.firstName;
   if (req.body.lastName) data.lastName = req.body.lastName;
   if (req.body.userName) data.userName = req.body.userName;
+  if (req.body.profilePic) data.profilePic.url = req.body.profilePic;
 
-  await User.findOneAndUpdate(req.data.email, data)
+  await User.findOneAndUpdate(req.data.email, { "$set": data }, { new: true })
     .exec()
-    .then(() => {
+    .then((updatedData) => {
       res.status(200).json({
         status: true,
         payload: {
           message: RESPONSE.UPDATE,
+          firstName: updatedData.firstName,
+          lastName: updatedData.lastName,
+          userName: updatedData.userName,
+          profilePic: updatedData.profilePic.url
         },
       });
     })
