@@ -15,6 +15,7 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     // verify it with server
     const decode = jwt.verify(token, ACCESS_SECRECT_KEY);
+    console.log(decode);
     req.data = decode;
     // continue the control-flow of the code
     next();
