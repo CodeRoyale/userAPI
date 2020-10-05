@@ -510,6 +510,7 @@ const profileUpdate = async (req, res) => {
   if (req.body.userName) updateData.userName = req.body.userName;
   if (req.body.profilePic) updateData.profilePic.url = req.body.profilePic;
 
+  console.log(req.data.email);
   await User.findOneAndUpdate(req.data.email, { "$set": updateData }, { new: true })
     .exec()
     .then((updatedData) => {
