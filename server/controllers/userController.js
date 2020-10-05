@@ -504,13 +504,13 @@ const getInfo = async (req, res) => {
 };
 
 const profileUpdate = async (req, res) => {
-  const data = {};
-  if (req.body.firstName) data.firstName = req.body.firstName;
-  if (req.body.lastName) data.lastName = req.body.lastName;
-  if (req.body.userName) data.userName = req.body.userName;
-  if (req.body.profilePic) data.profilePic.url = req.body.profilePic;
+  const updateData = {};
+  if (req.body.firstName) updateData.firstName = req.body.firstName;
+  if (req.body.lastName) updateData.lastName = req.body.lastName;
+  if (req.body.userName) updateData.userName = req.body.userName;
+  if (req.body.profilePic) updateData.profilePic.url = req.body.profilePic;
 
-  await User.findOneAndUpdate(req.data.email, { "$set": data }, { new: true })
+  await User.findOneAndUpdate(req.data.email, { "$set": updateData }, { new: true })
     .exec()
     .then((updatedData) => {
       res.status(200).json({
