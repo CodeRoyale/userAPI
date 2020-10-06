@@ -51,9 +51,7 @@ const verifyToken = (token, key) => {
 
 const getCookieOptions = (TTL) => ({
   maxAge: TTL,
-  httpOnly: true,
-  secure: process.env.NODE_ENV !== 'test',
-  sameSite: 'None',
+  httpOnly: true
 });
 
 module.exports = {
