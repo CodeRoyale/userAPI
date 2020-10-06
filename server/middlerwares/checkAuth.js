@@ -17,6 +17,14 @@ const [ACCESS_SECRECT_KEY, REFRESH_SECRECT_KEY] = [
 // check if the user has logged in before using the services
 module.exports = async (req, res, next) => {
   try {
+    if (!req.cookies._coderoyale_rtk) {
+      return res.status(403).json({
+        status: false,
+        payload: {
+          message: RESPONSE.LOGINREQUIRED,
+        },
+      });
+    }
     // bearer token
     let token = req.headers.authorization.split(' ')[1];
     // get the cookies
