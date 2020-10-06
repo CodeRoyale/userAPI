@@ -52,7 +52,6 @@ const verifyToken = (token, key) => {
 const getCookieOptions = (TTL) => ({
   maxAge: TTL,
   httpOnly: true,
-  secure: false,
   sameSite: 'None',
 });
 
