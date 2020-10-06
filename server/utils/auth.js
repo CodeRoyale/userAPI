@@ -52,7 +52,7 @@ const verifyToken = (token, key) => {
 const getCookieOptions = (TTL) => ({
   maxAge: TTL,
   httpOnly: true,
-  secure: process.env.NODE_ENV !== 'test',
+  secure: false,
   sameSite: 'None',
 });
 
