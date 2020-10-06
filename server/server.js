@@ -36,6 +36,7 @@ const path = require('path');
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
+        useFindAndModify: false,
       }
     );
     console.log('Connected to database');
@@ -109,7 +110,6 @@ app.use(express.json());
 // Routes
 app.use('/', require('./routes/main'));
 app.use('/users', require('./routes/users'));
-app.use('/token', require('./middlerwares/accessTokenGenerator'));
 app.use('/facebook', require('./utils/facebookAuth'));
 
 // start listening
