@@ -7,6 +7,7 @@ const {
   getRefreshToken,
   getCookieOptions,
 } = require('../utils/auth');
+const { bcryptData } = require('../utils/helpingFunctions');
 
 // secret keys and secret times
 /* eslint-disable */
@@ -36,12 +37,17 @@ const signupUser = async (req, res) => {
                   },
                 });
               }
+              const hash = bcryptData(req.body.password);
+              if (!hash) {
+                throw new Error('Password Encrption Failed');
+              }
               const newUser = new User({
                 userName: (data.given_name + data.iat).replace(/ /g, ''),
                 firstName: data.given_name,
                 lastName: data.family_name,
                 email: data.email,
                 issuer: req.body.issuer,
+                password: hash,
                 signUpType: req.body.signUpType,
                 profilePic: {
                   public_id: data.sub,
@@ -112,12 +118,17 @@ const signupUser = async (req, res) => {
               },
             });
           }
+          const hash = bcryptData(req.body.password);
+          if (!hash) {
+            throw new Error('Password Encrption Failed');
+          }
           const newUser = new User({
             userName: result.user.first_name + result.user.id,
             firstName: result.user.first_name,
             lastName: result.user.last_name,
             email: result.user.email,
             issuer: req.body.issuer,
+            password: hash,
             signUpType: req.body.signUpType,
             profilePic: {
               url: result.user.picture,
@@ -149,60 +160,6 @@ const signupUser = async (req, res) => {
             payload: {
               message: RESPONSE.ERROR,
             },
-          });
-        });
-    } else if (req.body.issuer === 'facebook') {
-      const data = {
-        access_token: req.body.access_token,
-      };
-      const url = FACEBOOK_APP_URL;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          accept: 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-
-      await User.find({ email: result.user.email })
-        .exec()
-        /* eslint-disable consistent-return */
-        .then((user) => {
-          if (user.length >= 1) {
-            return res.status(409).json({
-              message: 'User Already Exists',
-            });
-          }
-          const newUser = new User({
-            userName: result.user.first_name + result.user.id,
-            firstName: result.user.first_name,
-            lastName: result.user.last_name,
-            email: result.user.email,
-            issuer: req.body.issuer,
-            signUpType: req.body.signUpType,
-            profilePic: {
-              url: result.user.picture,
-            },
-          });
-          newUser
-            .save()
-            .then(() => {
-              res.status(201).json({
-                message: 'User Account Created',
-              });
-            })
-            .catch(() => {
-              res.status(401).json({
-                message: 'Required field missing or Username is in use',
-              });
-            });
-        })
-        /* eslint-enable consistent-return */
-        .catch((err) => {
-          res.status(500).json({
-            error: err,
           });
         });
     } else {
