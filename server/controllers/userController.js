@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { googleAuth } = require('../utils/googleAuth');
 const RESPONSE = require('../utils/constantResponse');
@@ -7,7 +8,6 @@ const {
   getRefreshToken,
   getCookieOptions,
 } = require('../utils/auth');
-const { bcryptData } = require('../utils/helpingFunctions');
 
 // secret keys and secret times
 /* eslint-disable */
@@ -37,41 +37,42 @@ const signupUser = async (req, res) => {
                   },
                 });
               }
-              const hash = bcryptData(req.body.password);
-              if (!hash) {
-                throw new Error('Password Encrption Failed');
-              }
-              const newUser = new User({
-                userName: (data.given_name + data.iat).replace(/ /g, ''),
-                firstName: data.given_name,
-                lastName: data.family_name,
-                email: data.email,
-                issuer: req.body.issuer,
-                password: hash,
-                signUpType: req.body.signUpType,
-                profilePic: {
-                  public_id: data.sub,
-                  url: data.picture,
-                },
-              });
-              newUser
-                .save()
-                .then(() => {
-                  res.status(201).json({
-                    status: true,
-                    payload: {
-                      message: RESPONSE.CREATED,
-                    },
-                  });
-                })
-                .catch(() => {
-                  res.status(406).json({
-                    status: false,
-                    payload: {
-                      message: RESPONSE.MISSING,
-                    },
-                  });
+              bcrypt.hash(req.body.password, 10, (err, hash) => {
+                if (err) {
+                  throw new Error('Password Encrption Failed');
+                }
+                const newUser = new User({
+                  userName: (data.given_name + data.iat).replace(/ /g, ''),
+                  firstName: data.given_name,
+                  lastName: data.family_name,
+                  email: data.email,
+                  issuer: req.body.issuer,
+                  password: hash,
+                  signUpType: req.body.signUpType,
+                  profilePic: {
+                    public_id: data.sub,
+                    url: data.picture,
+                  },
                 });
+                newUser
+                  .save()
+                  .then(() => {
+                    res.status(201).json({
+                      status: true,
+                      payload: {
+                        message: RESPONSE.CREATED,
+                      },
+                    });
+                  })
+                  .catch(() => {
+                    res.status(406).json({
+                      status: false,
+                      payload: {
+                        message: RESPONSE.MISSING,
+                      },
+                    });
+                  });
+              });
             })
             /* eslint-enable consistent-return */
             .catch(() => {
@@ -118,40 +119,41 @@ const signupUser = async (req, res) => {
               },
             });
           }
-          const hash = bcryptData(req.body.password);
-          if (!hash) {
-            throw new Error('Password Encrption Failed');
-          }
-          const newUser = new User({
-            userName: result.user.first_name + result.user.id,
-            firstName: result.user.first_name,
-            lastName: result.user.last_name,
-            email: result.user.email,
-            issuer: req.body.issuer,
-            password: hash,
-            signUpType: req.body.signUpType,
-            profilePic: {
-              url: result.user.picture,
-            },
-          });
-          newUser
-            .save()
-            .then(() => {
-              res.status(201).json({
-                status: true,
-                payload: {
-                  message: RESPONSE.CREATED,
-                },
-              });
-            })
-            .catch(() => {
-              res.status(406).json({
-                status: false,
-                payload: {
-                  message: RESPONSE.MISSING,
-                },
-              });
+          bcrypt.hash(req.body.password, 10, (err, hash) => {
+            if (err) {
+              throw new Error('Password Encrption Failed');
+            }
+            const newUser = new User({
+              userName: result.user.first_name + result.user.id,
+              firstName: result.user.first_name,
+              lastName: result.user.last_name,
+              email: result.user.email,
+              issuer: req.body.issuer,
+              password: hash,
+              signUpType: req.body.signUpType,
+              profilePic: {
+                url: result.user.picture,
+              },
             });
+            newUser
+              .save()
+              .then(() => {
+                res.status(201).json({
+                  status: true,
+                  payload: {
+                    message: RESPONSE.CREATED,
+                  },
+                });
+              })
+              .catch(() => {
+                res.status(406).json({
+                  status: false,
+                  payload: {
+                    message: RESPONSE.MISSING,
+                  },
+                });
+              });
+          });
         })
         /* eslint-enable consistent-return */
         .catch(() => {
