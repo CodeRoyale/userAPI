@@ -6,6 +6,7 @@ const RESPONSE = require('../utils/constantResponse');
 const {
   getAccessToken,
   getRefreshToken,
+  getUserNameToken,
   getCookieOptions,
 } = require('../utils/auth');
 
@@ -199,18 +200,14 @@ const loginUser = async (req, res) => {
                 );
                 res.cookie(
                   '_coderoyale_un',
-                  getAccessToken(user[0], ACCESS_SECRECT_KEY, true),
+                  getUserNameToken(user[0]),
                   getCookieOptions(604800000)
                 );
                 res.status(200).json({
                   status: true,
                   payload: {
                     message: RESPONSE.LOGIN,
-                    accessToken: getAccessToken(
-                      user[0],
-                      ACCESS_SECRECT_KEY + user[0].userName,
-                      false
-                    ),
+                    accessToken: getAccessToken(user[0]),
                   },
                 });
               } else {
@@ -264,18 +261,14 @@ const loginUser = async (req, res) => {
             );
             res.cookie(
               '_coderoyale_un',
-              getAccessToken(user[0], ACCESS_SECRECT_KEY, true),
+              getUserNameToken(user[0]),
               getCookieOptions(604800000)
             );
             res.status(200).json({
               status: true,
               payload: {
                 message: RESPONSE.LOGIN,
-                accessToken: getAccessToken(
-                  user[0],
-                  ACCESS_SECRECT_KEY + user[0].userName,
-                  false
-                ),
+                accessToken: getAccessToken(user[0]),
               },
             });
           } else {

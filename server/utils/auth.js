@@ -9,7 +9,7 @@ const [ACCESS_SECRECT_TIME, REFRESH_SECRECT_KEY, REFRESH_SECRECT_TIME] = [
 ];
 /* eslint-enable */
 
-const getAccessToken = (user, secret, long) => {
+const getAccessToken = (user) => {
   const accessToken = jwt.sign(
     {
       email: user.email,
@@ -18,9 +18,22 @@ const getAccessToken = (user, secret, long) => {
       lastName: user.lastName,
       picture: user.profilePic.url,
     },
-    secret,
+    ACCESS_SECRECT_TIME + user.userName,
     {
-      expiresIn: long ? REFRESH_SECRECT_TIME : ACCESS_SECRECT_TIME,
+      expiresIn: ACCESS_SECRECT_TIME,
+    }
+  );
+  return accessToken;
+};
+
+const getUserNameToken = (user) => {
+  const accessToken = jwt.sign(
+    {
+      userName: user.userName,
+    },
+    ACCESS_SECRECT_TIME + user.email,
+    {
+      expiresIn: REFRESH_SECRECT_TIME,
     }
   );
   return accessToken;
@@ -45,6 +58,7 @@ const verifyToken = (token, key) => {
     const payload = jwt.verify(token, key);
     return payload;
   } catch (err) {
+    console.log(err);
     return false;
   }
 };
@@ -59,6 +73,7 @@ const getCookieOptions = (TTL) => ({
 module.exports = {
   getAccessToken,
   getRefreshToken,
+  getUserNameToken,
   verifyToken,
   getCookieOptions,
 };
