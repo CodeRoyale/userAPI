@@ -2,7 +2,13 @@ const jwt = require('jsonwebtoken');
 
 // secret keys and secret times
 /* eslint-disable */
-const [ACCESS_SECRECT_TIME, REFRESH_SECRECT_KEY, REFRESH_SECRECT_TIME] = [
+const [
+  ACCESS_SECRECT_KEY,
+  ACCESS_SECRECT_TIME,
+  REFRESH_SECRECT_KEY,
+  REFRESH_SECRECT_TIME,
+] = [
+  process.env.ACCESS_SECRECT_KEY || secrets.ACCESS_SECRECT_KEY,
   process.env.ACCESS_SECRECT_TIME || secrets.ACCESS_SECRECT_TIME,
   process.env.REFRESH_SECRECT_KEY || secrets.REFRESH_SECRECT_KEY,
   process.env.REFRESH_SECRECT_TIME || secrets.REFRESH_SECRECT_TIME,
@@ -18,7 +24,7 @@ const getAccessToken = (user) => {
       lastName: user.lastName,
       picture: user.profilePic.url,
     },
-    ACCESS_SECRECT_TIME + user.userName,
+    ACCESS_SECRECT_KEY + user.userName,
     {
       expiresIn: ACCESS_SECRECT_TIME,
     }
@@ -31,7 +37,7 @@ const getUserNameToken = (user) => {
     {
       userName: user.userName,
     },
-    ACCESS_SECRECT_TIME + user.email,
+    ACCESS_SECRECT_KEY,
     {
       expiresIn: REFRESH_SECRECT_TIME,
     }

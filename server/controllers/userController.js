@@ -12,9 +12,7 @@ const {
 
 // secret keys and secret times
 /* eslint-disable */
-const [ACCESS_SECRECT_KEY, REFRESH_SECRECT_KEY, FACEBOOK_APP_URL] = [
-  process.env.ACCESS_SECRECT_KEY || secrets.ACCESS_SECRECT_KEY,
-  process.env.REFRESH_SECRECT_KEY || secrets.REFRESH_SECRECT_KEY,
+const [FACEBOOK_APP_URL] = [
   process.env.FACEBOOK_APP_URL || secrets.FACEBOOK_APP_URL,
 ];
 /* eslint-enable */

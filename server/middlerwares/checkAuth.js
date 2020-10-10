@@ -3,6 +3,7 @@ const User = require('../models/user');
 const {
   getAccessToken,
   getRefreshToken,
+  getUserNameToken,
   verifyToken,
   getCookieOptions,
 } = require('../utils/auth');
@@ -26,7 +27,7 @@ module.exports = async (req, res, next) => {
     console.log('UN_cookies ', userName);
 
     // username is stored signed with JWT_KEY
-    userName = verifyToken(userName, ACCESS_SECRECT_KEY);
+    userName = verifyToken(userName, ACCESS_SECRECT_KEY).userName;
 
     console.log('UserName ', userName);
 
@@ -53,7 +54,7 @@ module.exports = async (req, res, next) => {
       }
 
       // if the refreshJwtToken worked so set new tokens
-      token = getAccessToken(user, ACCESS_SECRECT_KEY + user.userName, false);
+      token = getAccessToken(user);
       res.cookie(
         '_coderoyale_rtk',
         getRefreshToken(user),
@@ -61,7 +62,7 @@ module.exports = async (req, res, next) => {
       );
       res.cookie(
         '_coderoyale_un',
-        getAccessToken(user, ACCESS_SECRECT_KEY, true),
+        getUserNameToken(user),
         getCookieOptions(604800000)
       );
     }
