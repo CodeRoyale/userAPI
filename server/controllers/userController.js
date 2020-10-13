@@ -444,7 +444,7 @@ const profileUpdate = async (req, res) => {
 };
 
 const userNameAvailability = async (req, res) => {
-  await User.find(req.query.userName)
+  await User.find({ userName: req.query.userName })
     .exec()
     .then((user) => {
       if (user.length === 0) {
@@ -464,7 +464,8 @@ const userNameAvailability = async (req, res) => {
         });
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.log(error);
       res.status(500).json({
         status: false,
         payload: {
