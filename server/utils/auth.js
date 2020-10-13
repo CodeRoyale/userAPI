@@ -64,7 +64,6 @@ const verifyToken = (token, key) => {
     const payload = jwt.verify(token, key);
     return payload;
   } catch (err) {
-    console.log(err);
     return false;
   }
 };

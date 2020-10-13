@@ -419,17 +419,22 @@ const profileUpdate = async (req, res) => {
     { new: true }
   )
     .exec()
-    .then((updatedData) => {
+    .then((user) => {
+      res.cookie(
+        '_coderoyale_rtk',
+        getRefreshToken(user),
+        getCookieOptions(604800000)
+      );
+      res.cookie(
+        '_coderoyale_un',
+        getUserNameToken(user),
+        getCookieOptions(604800000)
+      );
       res.status(200).json({
         status: true,
         payload: {
           message: RESPONSE.UPDATE,
-          accessToken: req.accessToken,
-          firstName: updatedData.firstName,
-          lastName: updatedData.lastName,
-          userName: updatedData.userName,
-          profilePic: updatedData.profilePic.url,
-          email: updatedData.email,
+          accessToken: getAccessToken(user),
         },
       });
     })
@@ -444,7 +449,7 @@ const profileUpdate = async (req, res) => {
 };
 
 const userNameAvailability = async (req, res) => {
-  await User.find(req.query.userName)
+  await User.find({ userName: req.query.userName })
     .exec()
     .then((user) => {
       if (user.length === 0) {
@@ -464,7 +469,8 @@ const userNameAvailability = async (req, res) => {
         });
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.log(error);
       res.status(500).json({
         status: false,
         payload: {

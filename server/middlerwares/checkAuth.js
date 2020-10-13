@@ -24,23 +24,15 @@ module.exports = async (req, res, next) => {
     const refreshToken = req.cookies._coderoyale_rtk;
     let userName = req.cookies._coderoyale_un;
 
-    console.log('UN_cookies ', userName);
-
     // username is stored signed with JWT_KEY
     userName = verifyToken(userName, ACCESS_SECRECT_KEY).userName;
-
-    console.log('UserName ', userName);
 
     // verify accessToken  with server
     let payload = verifyToken(token, ACCESS_SECRECT_KEY + userName);
 
-    console.log('accessToken payload ', payload);
-
     // if accessToken verify failed
     if (!payload) {
       const user = await User.findOne({ userName: userName });
-
-      console.log('user', user);
 
       // check for the refreshtoken
       payload = verifyToken(
@@ -77,7 +69,6 @@ module.exports = async (req, res, next) => {
     next();
   } catch (error) {
     // token was expired or user had made changes in the token
-    console.log(error);
     res.status(401).json({
       status: false,
       payload: {
