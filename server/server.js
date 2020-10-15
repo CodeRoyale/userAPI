@@ -110,7 +110,7 @@ app.use(express.json());
 // Routes
 app.use('/', require('./routes/main'));
 app.use('/users', require('./routes/users'));
-app.use('/token', require('./middlerwares/accessTokenGenerator'));
+app.use('/precheck', require('./middlerwares/preCheck'));
 app.use('/facebook', require('./utils/facebookAuth'));
 
 // start listening

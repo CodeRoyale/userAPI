@@ -1,56 +1,21 @@
-const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { googleAuth } = require('../utils/googleAuth');
 const RESPONSE = require('../utils/constantResponse');
+const {
+  getAccessToken,
+  getRefreshToken,
+  getUserNameToken,
+  getCookieOptions,
+} = require('../utils/auth');
 
 // secret keys and secret times
 /* eslint-disable */
-const [
-  ACCESS_SECRECT_KEY,
-  ACCESS_SECRECT_TIME,
-  REFRESH_SECRECT_KEY,
-  REFRESH_SECRECT_TIME,
-  FACEBOOK_APP_URL,
-] = [
-  process.env.ACCESS_SECRECT_KEY || secrets.ACCESS_SECRECT_KEY,
-  process.env.ACCESS_SECRECT_TIME || secrets.ACCESS_SECRECT_TIME,
-  process.env.REFRESH_SECRECT_KEY || secrets.REFRESH_SECRECT_KEY,
-  process.env.REFRESH_SECRECT_TIME || secrets.REFRESH_SECRECT_TIME,
+const [FACEBOOK_APP_URL] = [
   process.env.FACEBOOK_APP_URL || secrets.FACEBOOK_APP_URL,
 ];
 /* eslint-enable */
-
-function tokenGenerator(user) {
-  const accToken = jwt.sign(
-    {
-      email: user.email,
-      userName: user.userName,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      picture: user.profilePic.url,
-    },
-    ACCESS_SECRECT_KEY,
-    {
-      expiresIn: ACCESS_SECRECT_TIME,
-    }
-  );
-  const refToken = jwt.sign(
-    {
-      email: user.email,
-      userName: user.userName,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      picture: user.profilePic.url,
-      signUpType: user.signUpType,
-    },
-    REFRESH_SECRECT_KEY,
-    {
-      expiresIn: REFRESH_SECRECT_TIME,
-    }
-  );
-  return [accToken, refToken];
-}
 
 // signup
 const signupUser = async (req, res) => {
@@ -71,36 +36,42 @@ const signupUser = async (req, res) => {
                   },
                 });
               }
-              const newUser = new User({
-                userName: (data.given_name + data.iat).replace(/ /g, ''),
-                firstName: data.given_name,
-                lastName: data.family_name,
-                email: data.email,
-                issuer: req.body.issuer,
-                signUpType: req.body.signUpType,
-                profilePic: {
-                  public_id: data.sub,
-                  url: data.picture,
-                },
-              });
-              newUser
-                .save()
-                .then(() => {
-                  res.status(201).json({
-                    status: true,
-                    payload: {
-                      message: RESPONSE.CREATED,
-                    },
-                  });
-                })
-                .catch(() => {
-                  res.status(406).json({
-                    status: false,
-                    payload: {
-                      message: RESPONSE.MISSING,
-                    },
-                  });
+              bcrypt.hash(req.body.password, 10, (err, hash) => {
+                if (err) {
+                  throw new Error('Password Encrption Failed');
+                }
+                const newUser = new User({
+                  userName: (data.given_name + data.iat).replace(/ /g, ''),
+                  firstName: data.given_name,
+                  lastName: data.family_name,
+                  email: data.email,
+                  issuer: req.body.issuer,
+                  password: hash,
+                  signUpType: req.body.signUpType,
+                  profilePic: {
+                    public_id: data.sub,
+                    url: data.picture,
+                  },
                 });
+                newUser
+                  .save()
+                  .then(() => {
+                    res.status(201).json({
+                      status: true,
+                      payload: {
+                        message: RESPONSE.CREATED,
+                      },
+                    });
+                  })
+                  .catch(() => {
+                    res.status(406).json({
+                      status: false,
+                      payload: {
+                        message: RESPONSE.MISSING,
+                      },
+                    });
+                  });
+              });
             })
             /* eslint-enable consistent-return */
             .catch(() => {
@@ -147,35 +118,41 @@ const signupUser = async (req, res) => {
               },
             });
           }
-          const newUser = new User({
-            userName: result.user.first_name + result.user.id,
-            firstName: result.user.first_name,
-            lastName: result.user.last_name,
-            email: result.user.email,
-            issuer: req.body.issuer,
-            signUpType: req.body.signUpType,
-            profilePic: {
-              url: result.user.picture,
-            },
-          });
-          newUser
-            .save()
-            .then(() => {
-              res.status(201).json({
-                status: true,
-                payload: {
-                  message: RESPONSE.CREATED,
-                },
-              });
-            })
-            .catch(() => {
-              res.status(406).json({
-                status: false,
-                payload: {
-                  message: RESPONSE.MISSING,
-                },
-              });
+          bcrypt.hash(req.body.password, 10, (err, hash) => {
+            if (err) {
+              throw new Error('Password Encrption Failed');
+            }
+            const newUser = new User({
+              userName: result.user.first_name + result.user.id,
+              firstName: result.user.first_name,
+              lastName: result.user.last_name,
+              email: result.user.email,
+              issuer: req.body.issuer,
+              password: hash,
+              signUpType: req.body.signUpType,
+              profilePic: {
+                url: result.user.picture,
+              },
             });
+            newUser
+              .save()
+              .then(() => {
+                res.status(201).json({
+                  status: true,
+                  payload: {
+                    message: RESPONSE.CREATED,
+                  },
+                });
+              })
+              .catch(() => {
+                res.status(406).json({
+                  status: false,
+                  payload: {
+                    message: RESPONSE.MISSING,
+                  },
+                });
+              });
+          });
         })
         /* eslint-enable consistent-return */
         .catch(() => {
@@ -184,60 +161,6 @@ const signupUser = async (req, res) => {
             payload: {
               message: RESPONSE.ERROR,
             },
-          });
-        });
-    } else if (req.body.issuer === 'facebook') {
-      const data = {
-        access_token: req.body.access_token,
-      };
-      const url = FACEBOOK_APP_URL;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          accept: 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-
-      await User.find({ email: result.user.email })
-        .exec()
-        /* eslint-disable consistent-return */
-        .then((user) => {
-          if (user.length >= 1) {
-            return res.status(409).json({
-              message: 'User Already Exists',
-            });
-          }
-          const newUser = new User({
-            userName: result.user.first_name + result.user.id,
-            firstName: result.user.first_name,
-            lastName: result.user.last_name,
-            email: result.user.email,
-            issuer: req.body.issuer,
-            signUpType: req.body.signUpType,
-            profilePic: {
-              url: result.user.picture,
-            },
-          });
-          newUser
-            .save()
-            .then(() => {
-              res.status(201).json({
-                message: 'User Account Created',
-              });
-            })
-            .catch(() => {
-              res.status(401).json({
-                message: 'Required field missing or Username is in use',
-              });
-            });
-        })
-        /* eslint-enable consistent-return */
-        .catch((err) => {
-          res.status(500).json({
-            error: err,
           });
         });
     } else {
@@ -268,13 +191,21 @@ const loginUser = async (req, res) => {
             .exec()
             .then((user) => {
               if (user.length >= 1) {
-                const [accessToken, refreshToken] = tokenGenerator(user[0]);
-                res.cookie('token', refreshToken, { httpOnly: true });
+                res.cookie(
+                  '_coderoyale_rtk',
+                  getRefreshToken(user[0]),
+                  getCookieOptions(604800000)
+                );
+                res.cookie(
+                  '_coderoyale_un',
+                  getUserNameToken(user[0]),
+                  getCookieOptions(604800000)
+                );
                 res.status(200).json({
                   status: true,
                   payload: {
                     message: RESPONSE.LOGIN,
-                    accessToken: accessToken,
+                    accessToken: getAccessToken(user[0]),
                   },
                 });
               } else {
@@ -321,13 +252,21 @@ const loginUser = async (req, res) => {
         .exec()
         .then((user) => {
           if (user.length === 1) {
-            const [accessToken, refreshToken] = tokenGenerator(user[0]);
-            res.cookie('token', refreshToken, { httpOnly: true });
+            res.cookie(
+              '_coderoyale_rtk',
+              getRefreshToken(user[0]),
+              getCookieOptions(604800000)
+            );
+            res.cookie(
+              '_coderoyale_un',
+              getUserNameToken(user[0]),
+              getCookieOptions(604800000)
+            );
             res.status(200).json({
               status: true,
               payload: {
                 message: RESPONSE.LOGIN,
-                accessToken: accessToken,
+                accessToken: getAccessToken(user[0]),
               },
             });
           } else {
@@ -345,42 +284,6 @@ const loginUser = async (req, res) => {
             payload: {
               message: RESPONSE.ERROR,
             },
-          });
-        });
-    } else if (req.body.issuer === 'facebook') {
-      const data = {
-        access_token: req.body.access_token,
-      };
-      const url = FACEBOOK_APP_URL;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          accept: 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      await User.find({ email: result.user.email })
-        .exec()
-        .then((user) => {
-          if (user.length >= 1) {
-            const [accessToken, refreshToken] = tokenGenerator(user[0]);
-            res.cookie('token', refreshToken, { httpOnly: true });
-            res.status(200).json({
-              message: 'Login successful',
-              accessToken: accessToken,
-            });
-          } else {
-            res.status(401).json({
-              message: "User Doesn't Exists",
-            });
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(500).json({
-            error: 'Server Error',
           });
         });
     } else {
@@ -404,7 +307,8 @@ const loginUser = async (req, res) => {
 // signout
 const logoutUser = async (req, res) => {
   try {
-    res.clearCookie('token');
+    res.clearCookie('_coderoyale_rtk');
+    res.clearCookie('_coderoyale_un');
     res.status(200).json({
       status: true,
       payload: {
@@ -424,16 +328,14 @@ const logoutUser = async (req, res) => {
 // deleteUser
 const deleteUser = async (req, res) => {
   try {
-    // get the bearer token from headers
-    const token = req.headers.authorization.split(' ')[1];
-    // decode the token to get the data
-    const decoded = jwt.decode(token, { complete: true });
-    // data is stored is in playload
-    const payloadData = decoded.payload;
+    // get data in playload from middleware
+    const payloadData = req.payload;
     User.deleteOne({ userName: payloadData.userName })
       .exec()
       .then((data) => {
         if (data.n === 1) {
+          res.clearCookie('_coderoyale_rtk');
+          res.clearCookie('_coderoyale_un');
           res.status(200).json({
             status: true,
             payload: {
@@ -441,10 +343,10 @@ const deleteUser = async (req, res) => {
             },
           });
         } else {
-          res.status(403).json({
+          res.status(404).json({
             status: false,
             payload: {
-              message: RESPONSE.REGISTER,
+              message: RESPONSE.NOUSER,
             },
           });
         }
@@ -477,6 +379,7 @@ const getInfo = async (req, res) => {
           status: true,
           payload: {
             message: RESPONSE.INFO,
+            accessToken: req.accessToken,
             email: user[0].email,
             userName: user[0].userName,
             firstName: user[0].firstName,
@@ -485,10 +388,10 @@ const getInfo = async (req, res) => {
           },
         });
       } else {
-        res.status(403).json({
+        res.status(404).json({
           status: false,
           payload: {
-            message: RESPONSE.REGISTER,
+            message: RESPONSE.NOUSER,
           },
         });
       }
@@ -510,18 +413,28 @@ const profileUpdate = async (req, res) => {
   if (req.body.userName) updateData.userName = req.body.userName;
   if (req.body.profilePic) updateData.profilePic.url = req.body.profilePic;
 
-  await User.findOneAndUpdate({ email: req.data.email }, { "$set": updateData }, { new: true })
+  await User.findOneAndUpdate(
+    { email: req.payload.email },
+    { $set: updateData },
+    { new: true }
+  )
     .exec()
-    .then((updatedData) => {
+    .then((user) => {
+      res.cookie(
+        '_coderoyale_rtk',
+        getRefreshToken(user),
+        getCookieOptions(604800000)
+      );
+      res.cookie(
+        '_coderoyale_un',
+        getUserNameToken(user),
+        getCookieOptions(604800000)
+      );
       res.status(200).json({
         status: true,
         payload: {
           message: RESPONSE.UPDATE,
-          firstName: updatedData.firstName,
-          lastName: updatedData.lastName,
-          userName: updatedData.userName,
-          profilePic: updatedData.profilePic.url,
-          email: updatedData.email,
+          accessToken: getAccessToken(user),
         },
       });
     })
@@ -536,7 +449,7 @@ const profileUpdate = async (req, res) => {
 };
 
 const userNameAvailability = async (req, res) => {
-  await User.find(req.query.userName)
+  await User.find({ userName: req.query.userName })
     .exec()
     .then((user) => {
       if (user.length === 0) {
@@ -544,6 +457,7 @@ const userNameAvailability = async (req, res) => {
           status: true,
           payload: {
             message: RESPONSE.AVAILABLE,
+            accessToken: req.accessToken,
           },
         });
       } else {
@@ -555,7 +469,8 @@ const userNameAvailability = async (req, res) => {
         });
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.log(error);
       res.status(500).json({
         status: false,
         payload: {
