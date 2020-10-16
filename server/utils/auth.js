@@ -64,6 +64,9 @@ const verifyToken = (token, key) => {
     const payload = jwt.verify(token, key);
     return payload;
   } catch (err) {
+    if (err.message !== 'jwt expired') {
+      return err;
+    }
     return false;
   }
 };

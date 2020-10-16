@@ -41,7 +41,7 @@ const signupUser = async (req, res) => {
                   throw new Error('Password Encrption Failed');
                 }
                 const newUser = new User({
-                  userName: (data.given_name + data.iat).replace(/ /g, ''),
+                  userName: data.email.match(/^([^@]*)@/)[1],
                   firstName: data.given_name,
                   lastName: data.family_name,
                   email: data.email,
@@ -123,7 +123,7 @@ const signupUser = async (req, res) => {
               throw new Error('Password Encrption Failed');
             }
             const newUser = new User({
-              userName: result.user.first_name + result.user.id,
+              userName: result.user.email.match(/^([^@]*)@/)[1],
               firstName: result.user.first_name,
               lastName: result.user.last_name,
               email: result.user.email,
