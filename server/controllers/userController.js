@@ -27,7 +27,7 @@ const signupUser = async (req, res) => {
           await User.find({ email: data.email })
             .exec()
             /* eslint-disable consistent-return */
-            .then((user) => {
+            .then(async (user) => {
               if (user.length === 1) {
                 return res.status(409).json({
                   status: true,
@@ -36,12 +36,29 @@ const signupUser = async (req, res) => {
                   },
                 });
               }
+              let username = data.email.match(/^([^@]*)@/)[1];
+              await User.find({ userName: username })
+                .exec()
+                .then((usercheck) => {
+                  if (usercheck.length !== 0) {
+                    username += usercheck.length;
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                  res.status(500).json({
+                    status: false,
+                    payload: {
+                      message: RESPONSE.ERROR,
+                    },
+                  });
+                });
               bcrypt.hash(req.body.password, 10, (err, hash) => {
                 if (err) {
                   throw new Error('Password Encrption Failed');
                 }
                 const newUser = new User({
-                  userName: data.email.match(/^([^@]*)@/)[1],
+                  userName: username,
                   firstName: data.given_name,
                   lastName: data.family_name,
                   email: data.email,
@@ -109,7 +126,7 @@ const signupUser = async (req, res) => {
       await User.find({ email: result.user.email })
         .exec()
         /* eslint-disable consistent-return */
-        .then((user) => {
+        .then(async (user) => {
           if (user.length >= 1) {
             return res.status(409).json({
               status: false,
@@ -118,12 +135,29 @@ const signupUser = async (req, res) => {
               },
             });
           }
+          let username = result.user.email.match(/^([^@]*)@/)[1];
+          await User.find({ userName: username })
+            .exec()
+            .then((usercheck) => {
+              if (usercheck.length !== 0) {
+                username += usercheck.length;
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+              res.status(500).json({
+                status: false,
+                payload: {
+                  message: RESPONSE.ERROR,
+                },
+              });
+            });
           bcrypt.hash(req.body.password, 10, (err, hash) => {
             if (err) {
               throw new Error('Password Encrption Failed');
             }
             const newUser = new User({
-              userName: result.user.email.match(/^([^@]*)@/)[1],
+              userName: username,
               firstName: result.user.first_name,
               lastName: result.user.last_name,
               email: result.user.email,
