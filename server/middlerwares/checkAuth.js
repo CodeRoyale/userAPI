@@ -23,12 +23,26 @@ module.exports = async (req, res, next) => {
     // get the cookies
     const refreshToken = req.cookies._coderoyale_rtk;
     let userName = req.cookies._coderoyale_un;
+    let payload;
 
     // username is stored signed with JWT_KEY
     userName = verifyToken(userName, ACCESS_SECRECT_KEY).userName;
 
     // verify accessToken  with server
-    let payload = verifyToken(token, ACCESS_SECRECT_KEY + userName);
+    try {
+      payload = verifyToken(token, ACCESS_SECRECT_KEY + userName);
+    } catch (err) {
+      if (err.message !== 'jwt expired') {
+        res.clearCookie('_coderoyale_rtk');
+        res.clearCookie('_coderoyale_un');
+        res.status(401).json({
+          status: false,
+          payload: {
+            message: RESPONSE.AUTHERROR,
+          },
+        });
+      }
+    }
 
     // if accessToken verify failed
     if (!payload) {
