@@ -7,13 +7,34 @@ const [
   ACCESS_SECRECT_TIME,
   REFRESH_SECRECT_KEY,
   REFRESH_SECRECT_TIME,
+  EMAILVERIFICATION_SECRECT_KEY,
+  EMAILVERIFICATION_SECRECT_TIME,
 ] = [
   process.env.ACCESS_SECRECT_KEY || secrets.ACCESS_SECRECT_KEY,
   process.env.ACCESS_SECRECT_TIME || secrets.ACCESS_SECRECT_TIME,
   process.env.REFRESH_SECRECT_KEY || secrets.REFRESH_SECRECT_KEY,
   process.env.REFRESH_SECRECT_TIME || secrets.REFRESH_SECRECT_TIME,
+  process.env.EMAILVERIFICATION_SECRECT_KEY ||
+    secrets.EMAILVERIFICATION_SECRECT_KEY,
+  process.env.EMAILVERIFICATION_SECRECT_TIME ||
+    secrets.EMAILVERIFICATION_SECRECT_TIME,
 ];
 /* eslint-enable */
+
+const getEmailVerificationToken = (user) => {
+  const emailVerificationToken = jwt.sign(
+    {
+      email: user.email,
+      userName: user.userName,
+      firstName: user.firstName,
+    },
+    EMAILVERIFICATION_SECRECT_KEY + user.userName,
+    {
+      expiresIn: EMAILVERIFICATION_SECRECT_TIME,
+    }
+  );
+  return emailVerificationToken;
+};
 
 const getAccessToken = (user) => {
   const accessToken = jwt.sign(
@@ -81,6 +102,7 @@ const getCookieOptions = (TTL) => ({
 });
 
 module.exports = {
+  getEmailVerificationToken,
   getAccessToken,
   getRefreshToken,
   getUserNameToken,
