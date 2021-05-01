@@ -1,0 +1,198 @@
+components:
+  responses:
+    signup201:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Signup Procedure of the User
+      example:
+        message: 'User Account Created'
+    signup409:
+      type: object
+      properties:
+        message:
+          type: object
+          description: User Exists
+      example:
+        message: 'User Already Exists'
+    signup401a:
+      type: object
+      title: 'Missing'
+      properties:
+        message:
+          type: object
+          description: Missing Fields
+      example:
+        message: 'Required field missing or Username is in use'
+    signup401b:
+      type: object
+      title: 'Invalid Token'
+      properties:
+        message:
+          type: object
+          description: Invalid token signature
+      example:
+        message: 'Invalid token signature'
+    signup401c:
+      type: object
+      title: 'Data Error'
+      properties:
+        message:
+          type: object
+          description: Unrecognized data
+      example:
+        message: 'Unrecognized data'
+    signup401d:
+      type: object
+      title: 'Error'
+      properties:
+        message:
+          type: object
+          description: Error Message
+      example:
+        message: 'Error'
+    signup500:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Error
+      example:
+        message: 'Internal Error'
+    login200:
+      type: object
+      properties:
+        message:
+          type: object
+          description: User Successfully logged in
+      example:
+        message: 'Login successful'
+    login401a:
+      type: object
+      title: 'No User'
+      properties:
+        message:
+          type: object
+          description: User Does not Exists
+      example:
+        message: 'User Does not Exists'
+    login401b:
+      type: object
+      title: 'Invalid Token'
+      properties:
+        message:
+          type: object
+          description: Invalid token signature
+      example:
+        message: 'Invalid token signature'
+    login401c:
+      type: object
+      title: 'Data Error'
+      properties:
+        message:
+          type: object
+          description: Unrecognized data
+      example:
+        message: 'Unrecognized data'
+    login401d:
+      type: object
+      title: 'Error'
+      properties:
+        message:
+          type: object
+          description: Error Message
+      example:
+        message: 'Error'
+    login500:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Server Error
+      example:
+        message: 'Server Error'
+    logout200:
+      type: object
+      properties:
+        message:
+          type: object
+          description: User Logged Out
+      example:
+        message: 'Logout successful'
+    logout500:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Server Error
+      example:
+        message: 'Server Error'
+    delete200:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Delete User
+      example:
+        message: 'Account deleted successfully'
+    delete409:
+      type: object
+      properties:
+        message:
+          type: object
+          description: User Not Available
+      example:
+        message: 'Account does not exist'
+    delete401:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Account Not Proper
+      example:
+        message: 'Account not sound'
+    delete500:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Error
+      example:
+        message: 'Server Error'
+    info200:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Getting User Info
+      example:
+        email: donaldabraham0001@gmail.com
+        userName: donald0109
+        firstName: Donald
+        lastName: Abraham
+        picture: https://www.google.com/url?sa=i&source=imgres&cd=&cad=rja&uact=8&ved=2ahUKEwiEtNbT46TrAhWH83MBHQkICcIQjRx6BAgBEAQ&url=https%3A%2F%2Fwww.shutterstock.com%2Fsearch%2Fimage&psig=AOvVaw3t1GT99bhLtGhIYpc4PatV&ust=1597840983437824
+    info401:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Acoount Not Available
+      example:
+        message: 'User Does not Exists'
+    info500:
+      type: object
+      properties:
+        message:
+          type: object
+          description: Error in Server
+      example:
+        message: 'Server Error'
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error
+      example:
+        message: Error message

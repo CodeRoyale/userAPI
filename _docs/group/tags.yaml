@@ -6,3 +6,10 @@ tags:
   - name: UserRoute
     x-displayName: User Route
     description: Route Management User
+x-tagGroups:
+  - name: Schema
+    tags:
+      - User
+  - name: Route Management
+    tags:
+      - UserRoute

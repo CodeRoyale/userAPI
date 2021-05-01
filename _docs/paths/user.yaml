@@ -1,0 +1,148 @@
+path:
+  /users/signup:
+    post:
+      summary: SIGNUP
+      tags: [UserRoute]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBody/signup'
+      responses:
+        '201':
+          description: Create a new User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/signup201'
+        '409':
+          description: User Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/signup409'
+        '401':
+          description: Missing fields
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/signup401a'
+                  - $ref: '#/components/responses/signup401b'
+                  - $ref: '#/components/responses/signup401c'
+                  - $ref: '#/components/responses/signup401d'
+        '500':
+          description: Missing fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/signup500'
+  /users/login:
+    post:
+      summary: LOGIN
+      tags: [UserRoute]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBody/login'
+      responses:
+        '200':
+          description: Logged IN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/login200'
+        '401':
+          description: Error logging in
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/responses/login401a'
+                  - $ref: '#/components/responses/login401b'
+                  - $ref: '#/components/responses/login401c'
+                  - $ref: '#/components/responses/login401d'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/login500'
+  /users/logout:
+    get:
+      summary: LOGOUT
+      tags: [UserRoute]
+      responses:
+        '200':
+          description: Logged Out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/logout200'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/logout500'
+  /users/delete:
+    delete:
+      summary: DELETE
+      tags: [UserRoute]
+      responses:
+        '200':
+          description: Deleted User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/delete200'
+        '409':
+          description: Account Does not Exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/delete409'
+        '401':
+          description: Account not Sound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/delete401'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/delete500'
+  /users/info:
+    get:
+      summary: GET INFO
+      tags: [UserRoute]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBody/getinfo'
+      responses:
+        '200':
+          description: Info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/info200'
+        '401':
+          description: User Does Not Exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/info401'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/info500'
