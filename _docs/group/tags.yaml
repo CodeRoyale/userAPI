@@ -1,0 +1,8 @@
+tags:
+  - name: User
+    x-displayName: User Model
+    description: |
+      <SchemaDefinition schemaRef="#/components/schemas/UserSchemas" />
+  - name: UserRoute
+    x-displayName: User Route
+    description: Route Management User

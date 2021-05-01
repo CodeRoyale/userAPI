@@ -133,6 +133,11 @@ const options = {
   },
   // Path to the files where API documentations are written
   apis: [path.resolve(__dirname, '../_docs/*.js')],
+  // apis: [
+  //   path.resolve(__dirname, '../_docs/group/*.yaml'),
+  //   path.resolve(__dirname, '../_docs/components/*/*.yaml'),
+  //   path.resolve(__dirname, '../_docs/paths/*.yaml'),
+  // ],
 };
 
 // passing option as a parameter to swaggerJSDoc
