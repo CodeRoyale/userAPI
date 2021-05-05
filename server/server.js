@@ -89,6 +89,7 @@ app.use(cookieParser());
 const whitelist = [
   'http://localhost:3000',
   'https://coderoyaleclient.herokuapp.com',
+  'https://coderoyale.netlify.app',
 ];
 const corsOptions = {
   origin: function (origin, callback) {
