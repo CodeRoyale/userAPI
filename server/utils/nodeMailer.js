@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const ejs = require('ejs');
+const path = require('path');
 
 /* eslint-disable */
 const [MAIL, MAILPASS] = [
@@ -31,7 +32,7 @@ transporter.verify((error, success) => {
 
 const nodeMailer = async (firstName, email, url, next) => {
   ejs.renderFile(
-    '/home/coming---soon/coming_soon/git/codeRoyale/codeRoyale-api/views/verifyTemplate.ejs',
+    path.resolve(__dirname, '../../views/verifyTemplate.ejs'),
     { name: firstName, url: url },
     function (err, data) {
       if (err) {

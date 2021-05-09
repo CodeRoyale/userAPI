@@ -15,10 +15,11 @@ const {
 
 // secret keys and secret times
 /* eslint-disable */
-const [FACEBOOK_APP_URL, EMAILVERIFICATION_SECRECT_KEY] = [
+const [FACEBOOK_APP_URL, EMAILVERIFICATION_SECRECT_KEY, NODE_ENV] = [
   process.env.FACEBOOK_APP_URL || secrets.FACEBOOK_APP_URL,
   process.env.EMAILVERIFICATION_SECRECT_KEY ||
     secrets.EMAILVERIFICATION_SECRECT_KEY,
+  process.env.NODE_ENV || secrets.NODE_ENV,
 ];
 /* eslint-enable */
 
@@ -247,12 +248,15 @@ const signupUser = async (req, res) => {
                   },
                 });
               } else {
+                let verified;
+                if (NODE_ENV !== 'test') verified = false;
+                else verified = true;
                 const newUser = new User({
                   userName: username,
                   firstName: req.body.data.firstName,
                   lastName: req.body.data.lastName,
                   email: req.body.data.email,
-                  emailVerified: false,
+                  emailVerified: verified,
                   issuer: 'self',
                   password: hash,
                   signUpType: req.body.data.signUpType,
