@@ -1,69 +1,124 @@
-# CodeRoyale-API
+<a href="https://coderoyale.netlify.app/"><p align="center">
+<img height=100 src="public/Coderoyale.jpeg"/>
 
-This repository holds the API for the CodeRoyale platform.The goal of CodeRoyale is to create Competitive Programming platform where users can have coding battle with friends, random users and team battles to show case your DSA skills.
+</p></a>
+<p align="center">
+  <strong>Making competitive programming more fun and better!</strong>
+</p>
+<p align="center">
+  <a href="https://discord.gg/aCKem4h8te">
+    <img src="https://img.shields.io/discord/841533336581308416.svg?style=for-the-badge" alt="discord - users online" />
+  </a>
+</p>
 
-## Getting Started
+<h3 align="center">
+  <a href="https://github.com/CodeRoyale/codeRoyale-api/blob/master/CONTRIBUTING.md">Contribute</a>
+  <span> · </span>
+  <a href="https://discord.gg/aCKem4h8te">Community</a>
+  <span> · </span>
+  <a href="https://coderoyale-userapi.herokuapp.com/docs">Documentation</a>
+</h3>
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+---
 
-### Prerequisites
+## Structure
 
-What things you need to install the software and how to install them follow the [SETUP](https://github.com/CodeRoyale/codeRoyale-api/blob/master/SETUP.md#prerequisites)
+| Module           | Description |
+| :--------------- | :---------: |
+| [frontend](https://github.com/CodeRoyale/codeRoyale-frontend) |    desc     |
+| [lobby](https://github.com/CodeRoyale/codeRoyale-lobby)    |    desc     |
+| [questionAPI](https://github.com/CodeRoyale/codeRoyale-Question-api)    |    desc     |
+| [userAPI](https://github.com/CodeRoyale/codeRoyale-user-api)    |    desc     |
 
-### Installing
 
-Things you need to install before you get started with playing with the code.
-Follow the [Installation](https://github.com/CodeRoyale/codeRoyale-api/blob/master/SETUP.md#installation-and-usage)
 
-## Running the tests
-
-To run the automated tests for this system [Test](https://github.com/CodeRoyale/codeRoyale-api/blob/master/SETUP.md#testing)
-
-## Making changes
-
-Before starting to make [changes](https://github.com/CodeRoyale/codeRoyale-api/blob/master/SETUP.md#before-starting-to-make-changes)
-
-## Coding style tests
-
-Before commiting make sure your code follows the standard code style on the orgnisation. This can be done using this [Guide](https://github.com/CodeRoyale/codeRoyale-api/blob/master/SETUP.md#before-commiting--pushing-to-repo)
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system will update soon.
-
-## Built With
-
-* [Node.JS](https://nodejs.org/) - The backend framework used
-* [npm](https://www.npmjs.com/get-npm) - Dependency Management
-* [MongoDB](https://docs.mongodb.com/manual/installation/) - Database used
-* [swagger](https://swagger.io/docs/specification/about/) - API Documentation
-* [ESlint](https://eslint.org/docs/user-guide/configuring) - Code Style
-
-## Contributing
-
-Please read [CONTRIBUTING](https://github.com/CodeRoyale/codeRoyale-api/blob/master/CONTRIBUTING.md) for details on our code, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CodeRoyale/codeRoyale-api). 
-
-## Authors
-
-* **CodeRoyale** - *Initial work* - [CodeRoyale](https://github.com/CodeRoyale)
-
-See also the list of [contributors](https://github.com/orgs/CodeRoyale/people) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Inspiration
-* Fun
-* Better
 
 ## Branches
 
-- **master**: This branch contains the code running at production.
-- **develop**: This contains the latest code. All the contributing PRs must be sent to this branch.
+- development -> pr this branch for everything
+- master -> don't touch, this is what's running in production
+
+## Contributions
+
+userAPI is open to contributions, but I recommend creating an issue for letting us know about the feature you are working upon.
+Please read [CONTRIBUTING.md](https://github.com/CodeRoyale/codeRoyale-api/blob/master/CONTRIBUTING.md)
+
+See also the list of [contributors](https://github.com/orgs/CodeRoyale/people) who participated in this project.
+
+## Reviewers
+
+Contributors helping to review/merge pull requests:
+
+- [@SAchu47](https://github.com/SAchu47)
+- [@sastaachar](https://github.com/sastaachar)
+- [@naveen-770](https://github.com/naveen-770)
+- [@donald0109](https://github.com/donald0109)
+- [@vuld0](https://github.com/vuld0)
+- [@Rec0iL99](https://github.com/Rec0iL99)
+
+## Code of Conduct
+
+Please read [CODE_OF_CONDUCT.md](link) for details on our code of conduct.
+
+## How to run locally
+
+### Setup and run
+
+To setup the project locally follow the instructions:
+
+#### Fork
+
+_**Note**_: _This is only needed if you want to contribute to the project._
+
+If you want to contribute to the project you will have to create your own copy of the project on GitHub. You can do this by clicking the Fork button that can be found on the top right corner of the [landing page](https://github.com/CodeRoyale/codeRoyale-user-api) of the repository.
+
+#### Clone
+
+_**Note**_: _For this you need to install git on your machine. You can download the git tool from [here](https://git-scm.com/downloads)._
+
+- If you have forked the project, run the following command -
+
+  `git clone https://github.com/YOUR_GITHUB_USER_NAME/codeRoyale-user-api`
+
+  where `YOUR_GITHUB_USER_NAME` is your GitHub handle.
+
+- If you haven't forked the project, run the following command -
+
+  `git clone https://github.com/CodeRoyale/codeRoyale-user-api`
+
+#### Remote
+
+_**Note**_: _This is only needed if you want to contribute to the project._
+
+When a repository is cloned, it has a default remote named `origin` that points to your fork on GitHub, not the original repository it was forked from. To keep track of the original repository, you should add another remote named upstream. For this project it can be done by running the following command -
+
+`git remote add upstream https://github.com/CodeRoyale/codeRoyale-user-api`
+
+You can check that the previous command worked by running `git remote -v`. You should see the following output:
+
+```
+$ git remote -v
+origin  https://github.com/YOUR_GITHUB_USER_NAME/codeRoyale-user-api (fetch)
+origin  https://github.com/YOUR_GITHUB_USER_NAME/codeRoyale-user-api (push)
+upstream        https://github.com/CodeRoyale/codeRoyale-user-api (fetch)
+upstream        https://github.com/CodeRoyale/codeRoyale-user-api (push)
+```
+
+### Run app
+
+Download the latest stable version of NodeJs [here](https://nodejs.org/en/download/) and install it. Run `node --version` to verify successful installation.
+
+To get the User API running locally:
+
+- Clone this repository
+- `npm install --also=dev` to install all required dependencies
+- `npm run server` to start the local server with nodemon
+
+
+## Why did you make this?
+
+The goal of CodeRoyale is to create Competitive Programming platform where users can have coding battle with friends, random users and team battles to show case your DSA skills.
+
+## Attribution
+
+
