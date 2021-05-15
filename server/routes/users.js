@@ -5,8 +5,6 @@ const checkAuth = require('../middlerwares/checkAuth');
 
 const {
   signupUser,
-  emailVerification,
-  resendLink,
   loginUser,
   logoutUser,
   deleteUser,
@@ -16,8 +14,6 @@ const {
 } = require('../controllers/userController');
 
 router.post('/login', loginUser);
-router.post('/emailverification', emailVerification);
-router.post('/resendlink', resendLink);
 router.post('/signup', signupUser);
 router.get('/logout', checkAuth, logoutUser);
 router.delete('/delete', checkAuth, deleteUser);
