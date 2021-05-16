@@ -76,8 +76,6 @@ passport.use(
         picture: profile.photos[0].value,
       };
       /* eslint-enable */
-
-      // console.log(user);
       return done(null, user);
     }
   )
@@ -113,6 +111,13 @@ app.use('/', require('./routes/main'));
 app.use('/users', require('./routes/users'));
 app.use('/precheck', require('./middlerwares/preCheck'));
 app.use('/facebook', require('./utils/facebookAuth'));
+
+// mock login test
+if (process.env.NODE_ENV !== 'production') {
+  /* eslint-disable */
+  app.use('/mock', require('./routes/mock'));
+  /* eslint-enable */
+}
 
 // start listening
 const server = app.listen(PORT, () => {
