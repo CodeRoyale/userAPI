@@ -22,11 +22,8 @@ const registerData = {
 };
 
 const loginData = {
-  issuer: 'self',
-  data: {
-    email: 'coderoyale@gmail.com',
-    password: 'hash',
-  },
+  email: 'coderoyale@gmail.com',
+  password: 'hash',
 };
 
 const updateData = {
@@ -39,29 +36,10 @@ var authenticatedUser = request.agent(server);
 var token;
 
 describe('USER API TESTING', () => {
-  before((done) => {
-    User.deleteMany({}, () => {
-      done();
-    });
-  });
-
-  it('it should signup user', (done) => {
-    chai
-      .request(server)
-      .post('/users/signup')
-      .send(registerData)
-      .end((err, res) => {
-        res.should.have.status(201);
-        res.body.should.have.property('status').eql(true);
-        res.body.payload.should.have.property('message').eql('CREATED');
-        done();
-      });
-  });
-
   // Login User
   it('it should login user', (done) => {
     authenticatedUser
-      .post('/users/login')
+      .post('/mock')
       .send(loginData)
       .end((err, res) => {
         res.should.have.status(200);
