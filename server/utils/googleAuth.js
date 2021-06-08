@@ -4,7 +4,7 @@ const { OAuth2Client } = googleAuthLibrary;
 
 // secret keys and secret times
 /* eslint-disable */
-const [CLIENT_ID] = [process.env.CLIENT_ID || secrets.CLIENT_ID];
+const [CLIENT_ID] = [process.env.CLIENT_ID];
 /* eslint-enable */
 
 const client = new OAuth2Client(CLIENT_ID);

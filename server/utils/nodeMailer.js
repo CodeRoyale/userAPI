@@ -3,10 +3,7 @@ const ejs = require('ejs');
 const path = require('path');
 
 /* eslint-disable */
-const [MAIL, MAILPASS] = [
-  process.env.MAIL || secrets.MAIL,
-  process.env.MAILPASS || secrets.MAILPASS,
-];
+const [MAIL, MAILPASS] = [process.env.MAIL, process.env.MAILPASS];
 /* eslint-enable */
 
 // Creating transport instance

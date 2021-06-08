@@ -12,9 +12,7 @@ const {
 
 // secret keys and secret times
 /* eslint-disable */
-const [FACEBOOK_APP_URL] = [
-  process.env.FACEBOOK_APP_URL || secrets.FACEBOOK_APP_URL,
-];
+const [FACEBOOK_APP_URL] = [process.env.FACEBOOK_APP_URL];
 /* eslint-enable */
 
 // signup

@@ -7,8 +7,8 @@ const FacebookTokenStrategy = require('passport-facebook-token');
 
 /* eslint-disable */
 const [FACEBOOK_APP_ID, FACEBOOK_APP_SECRET] = [
-  process.env.FACEBOOK_APP_ID || secrets.FACEBOOK_APP_ID,
-  process.env.FACEBOOK_APP_SECRET || secrets.FACEBOOK_APP_SECRET,
+  process.env.FACEBOOK_APP_ID,
+  process.env.FACEBOOK_APP_SECRET,
 ];
 /* eslint-enable */
 
@@ -29,7 +29,7 @@ const path = require('path');
     await mongoose.connect(
       /* eslint-disable */
       process.env.NODE_ENV !== 'test'
-        ? process.env.DATABASE_URL || secrets.DATABASE_URL
+        ? process.env.DATABASE_URL
         : process.env.TEST_DATABASE_URL,
       /* eslint-enable */
       {
