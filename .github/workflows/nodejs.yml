@@ -34,8 +34,6 @@ jobs:
     - run: npm run prettier:check --if-present
     - run: npm run lint --if-present
     - run: npm test --if-present
-      env:
-        TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
     - run: TOKEN=${{ secrets.CODECOV_TOKEN }} npm run test:jest:codecov --if-present
     - run: npm run test-coverage --if-present
     - run: PORT=${{ secrets.CODECOV_TOKEN }} npm run codecov --if-present
