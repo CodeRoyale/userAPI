@@ -36,6 +36,18 @@ jobs:
     - run: npm test --if-present
       env:
         TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        ACCESS_SECRET_KEY: ${{ secrets.ACCESS_SECRET_KEY }}
+        ACCESS_SECRET_TIME: ${{ secrets.ACCESS_SECRET_TIME }}
+        REFRESH_SECRET_KEY: ${{ secrets.REFRESH_SECRET_KEY }}
+        REFRESH_SECRET_TIME: ${{ secrets.REFRESH_SECRET_TIME }}
+        EMAILVERIFICATION_SECRET_KEY: ${{ secrets.EMAILVERIFICATION_SECRET_KEY }}
+        EMAILVERIFICATION_SECRET_TIME: ${{ secrets.EMAILVERIFICATION_SECRET_TIME }}
+        FACEBOOK_APP_ID: ${{ secrets.FACEBOOK_APP_ID }}
+        FACEBOOK_APP_SECRET: ${{ secrets.FACEBOOK_APP_SECRET }}
+        FACEBOOK_APP_URL: ${{ secrets.FACEBOOK_APP_URL }}
+        MAIL: ${{ secrets.MAIL }}
+        MAILPASS: ${{ secrets.MAILPASS }}
     - run: TOKEN=${{ secrets.CODECOV_TOKEN }} npm run test:jest:codecov --if-present
     - run: npm run test-coverage --if-present
     - run: PORT=${{ secrets.CODECOV_TOKEN }} npm run codecov --if-present
