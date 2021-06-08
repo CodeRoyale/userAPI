@@ -38,4 +38,3 @@ jobs:
     - run: PORT=${{ secrets.CODECOV_TOKEN }} npm run codecov --if-present
     env:
         CI: true
-        TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
